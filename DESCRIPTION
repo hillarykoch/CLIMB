@@ -1,0 +1,33 @@
+Package: CLIMB
+Type: Package
+Title: Composite LIkelihood eMpirical Bayes
+Version: 0.1.0
+Author: Hillary Koch
+Maintainer: <hillary.koch01@gmail.com>
+Description: Simulation, class selection, and mixture modeling for models with a combinatorial explosion in the number of latent classes.
+License: Artistic-2.0
+Encoding: UTF-8
+LazyData: true
+Imports:
+    abind,
+    doParallel,
+    dplyr,
+    foreach,
+    JuliaCall,
+    LaplacesDemon,
+    magrittr,
+    mvtnorm,
+    nimble,
+    parallel,
+    plyr,
+    purrr,
+    readr,
+    Rcpp (>= 0.12.16),
+    stats,
+    stringr,
+    testthat
+LinkingTo:
+    Rcpp,
+    RcppArmadillo
+SystemRequirements:
+    C++11
