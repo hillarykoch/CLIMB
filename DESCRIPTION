@@ -17,7 +17,6 @@ Imports:
     LaplacesDemon,
     magrittr,
     mvtnorm,
-    nimble,
     parallel,
     plyr,
     purrr,

@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // cgetPaths
 arma::mat cgetPaths(std::string filepath);
-RcppExport SEXP _LIEB_cgetPaths(SEXP filepathSEXP) {
+RcppExport SEXP _CLIMB_cgetPaths(SEXP filepathSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // crowMatch
 arma::uvec crowMatch(arma::mat assoc, arma::mat nonconsec);
-RcppExport SEXP _LIEB_crowMatch(SEXP assocSEXP, SEXP nonconsecSEXP) {
+RcppExport SEXP _CLIMB_crowMatch(SEXP assocSEXP, SEXP nonconsecSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,7 +31,7 @@ END_RCPP
 }
 // get_list_names
 std::vector<std::string> get_list_names(Rcpp::List L);
-RcppExport SEXP _LIEB_get_list_names(SEXP LSEXP) {
+RcppExport SEXP _CLIMB_get_list_names(SEXP LSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -42,7 +42,7 @@ END_RCPP
 }
 // cpaste0
 std::string cpaste0(std::vector<std::string> str1);
-RcppExport SEXP _LIEB_cpaste0(SEXP str1SEXP) {
+RcppExport SEXP _CLIMB_cpaste0(SEXP str1SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -53,7 +53,7 @@ END_RCPP
 }
 // cstr_split
 arma::mat cstr_split(std::vector<std::string> strings, std::string split);
-RcppExport SEXP _LIEB_cstr_split(SEXP stringsSEXP, SEXP splitSEXP) {
+RcppExport SEXP _CLIMB_cstr_split(SEXP stringsSEXP, SEXP splitSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -65,7 +65,7 @@ END_RCPP
 }
 // trans_func
 int trans_func(double& x);
-RcppExport SEXP _LIEB_trans_func(SEXP xSEXP) {
+RcppExport SEXP _CLIMB_trans_func(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -76,7 +76,7 @@ END_RCPP
 }
 // caccept
 arma::vec caccept(arma::mat x, arma::colvec y);
-RcppExport SEXP _LIEB_caccept(SEXP xSEXP, SEXP ySEXP) {
+RcppExport SEXP _CLIMB_caccept(SEXP xSEXP, SEXP ySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -88,7 +88,7 @@ END_RCPP
 }
 // cget_prior_count
 arma::colvec cget_prior_count(arma::mat red_class, Rcpp::List mus, arma::mat labels, int d, int n, int dist_tol);
-RcppExport SEXP _LIEB_cget_prior_count(SEXP red_classSEXP, SEXP musSEXP, SEXP labelsSEXP, SEXP dSEXP, SEXP nSEXP, SEXP dist_tolSEXP) {
+RcppExport SEXP _CLIMB_cget_prior_count(SEXP red_classSEXP, SEXP musSEXP, SEXP labelsSEXP, SEXP dSEXP, SEXP nSEXP, SEXP dist_tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -104,7 +104,7 @@ END_RCPP
 }
 // creduce_by_hamming
 arma::colvec creduce_by_hamming(arma::mat red_class, arma::colvec fullidx, int hamming_tol, int M);
-RcppExport SEXP _LIEB_creduce_by_hamming(SEXP red_classSEXP, SEXP fullidxSEXP, SEXP hamming_tolSEXP, SEXP MSEXP) {
+RcppExport SEXP _CLIMB_creduce_by_hamming(SEXP red_classSEXP, SEXP fullidxSEXP, SEXP hamming_tolSEXP, SEXP MSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -118,7 +118,7 @@ END_RCPP
 }
 // cget_true_assoc_idx
 arma::colvec cget_true_assoc_idx(arma::mat red_class, arma::mat true_assoc);
-RcppExport SEXP _LIEB_cget_true_assoc_idx(SEXP red_classSEXP, SEXP true_assocSEXP) {
+RcppExport SEXP _CLIMB_cget_true_assoc_idx(SEXP red_classSEXP, SEXP true_assocSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -130,7 +130,7 @@ END_RCPP
 }
 // cassociate
 arma::mat cassociate(arma::mat& paths, std::string filepath, int len_filt_h);
-RcppExport SEXP _LIEB_cassociate(SEXP pathsSEXP, SEXP filepathSEXP, SEXP len_filt_hSEXP) {
+RcppExport SEXP _CLIMB_cassociate(SEXP pathsSEXP, SEXP filepathSEXP, SEXP len_filt_hSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -143,7 +143,7 @@ END_RCPP
 }
 // abs3
 double abs3(double val);
-RcppExport SEXP _LIEB_abs3(SEXP valSEXP) {
+RcppExport SEXP _CLIMB_abs3(SEXP valSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -154,7 +154,7 @@ END_RCPP
 }
 // SCAD_1d
 arma::rowvec SCAD_1d(arma::rowvec prop, double lambda, int k, double a);
-RcppExport SEXP _LIEB_SCAD_1d(SEXP propSEXP, SEXP lambdaSEXP, SEXP kSEXP, SEXP aSEXP) {
+RcppExport SEXP _CLIMB_SCAD_1d(SEXP propSEXP, SEXP lambdaSEXP, SEXP kSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -168,7 +168,7 @@ END_RCPP
 }
 // double_SCAD_1d
 double double_SCAD_1d(double prop, double lambda, double a);
-RcppExport SEXP _LIEB_double_SCAD_1d(SEXP propSEXP, SEXP lambdaSEXP, SEXP aSEXP) {
+RcppExport SEXP _CLIMB_double_SCAD_1d(SEXP propSEXP, SEXP lambdaSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -181,7 +181,7 @@ END_RCPP
 }
 // SCAD
 arma::rowvec SCAD(arma::rowvec prop, double lambda, int k, double a);
-RcppExport SEXP _LIEB_SCAD(SEXP propSEXP, SEXP lambdaSEXP, SEXP kSEXP, SEXP aSEXP) {
+RcppExport SEXP _CLIMB_SCAD(SEXP propSEXP, SEXP lambdaSEXP, SEXP kSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -195,7 +195,7 @@ END_RCPP
 }
 // double_SCAD
 double double_SCAD(double prop, double lambda, double a);
-RcppExport SEXP _LIEB_double_SCAD(SEXP propSEXP, SEXP lambdaSEXP, SEXP aSEXP) {
+RcppExport SEXP _CLIMB_double_SCAD(SEXP propSEXP, SEXP lambdaSEXP, SEXP aSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -208,7 +208,7 @@ END_RCPP
 }
 // Mahalanobis
 arma::vec Mahalanobis(arma::mat x, arma::rowvec mu, arma::mat sigma);
-RcppExport SEXP _LIEB_Mahalanobis(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
+RcppExport SEXP _CLIMB_Mahalanobis(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -221,7 +221,7 @@ END_RCPP
 }
 // cdmvnorm
 arma::vec cdmvnorm(arma::mat x, arma::rowvec mu, arma::mat sigma);
-RcppExport SEXP _LIEB_cdmvnorm(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
+RcppExport SEXP _CLIMB_cdmvnorm(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -234,7 +234,7 @@ END_RCPP
 }
 // cget_constr_sigma
 arma::mat cget_constr_sigma(arma::rowvec sigma, double rho, arma::rowvec combos, int d);
-RcppExport SEXP _LIEB_cget_constr_sigma(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP combosSEXP, SEXP dSEXP) {
+RcppExport SEXP _CLIMB_cget_constr_sigma(SEXP sigmaSEXP, SEXP rhoSEXP, SEXP combosSEXP, SEXP dSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -248,7 +248,7 @@ END_RCPP
 }
 // func_to_optim
 double func_to_optim(const arma::colvec& init_val, arma::mat& x, arma::mat& h_est, arma::mat& combos);
-RcppExport SEXP _LIEB_func_to_optim(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP) {
+RcppExport SEXP _CLIMB_func_to_optim(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -262,7 +262,7 @@ END_RCPP
 }
 // optim_rcpp
 arma::vec optim_rcpp(const arma::vec& init_val, arma::mat& x, arma::mat& h_est, arma::mat& combos);
-RcppExport SEXP _LIEB_optim_rcpp(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP) {
+RcppExport SEXP _CLIMB_optim_rcpp(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -276,7 +276,7 @@ END_RCPP
 }
 // func_to_optim_bound
 double func_to_optim_bound(const arma::colvec& init_val, arma::mat& x, arma::mat& h_est, arma::mat& combos, double& bound);
-RcppExport SEXP _LIEB_func_to_optim_bound(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP boundSEXP) {
+RcppExport SEXP _CLIMB_func_to_optim_bound(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP boundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -291,7 +291,7 @@ END_RCPP
 }
 // optim_rcpp_bound
 arma::vec optim_rcpp_bound(const arma::vec& init_val, arma::mat& x, arma::mat& h_est, arma::mat& combos, double& bound);
-RcppExport SEXP _LIEB_optim_rcpp_bound(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP boundSEXP) {
+RcppExport SEXP _CLIMB_optim_rcpp_bound(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP boundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -306,7 +306,7 @@ END_RCPP
 }
 // cfconstr_pgmm
 Rcpp::List cfconstr_pgmm(arma::mat& x, arma::rowvec prop, arma::mat mu, arma::mat sigma, double rho, arma::mat combos, int k, arma::rowvec df, int lambda, int citermax, double tol, unsigned int LASSO, double bound);
-RcppExport SEXP _LIEB_cfconstr_pgmm(SEXP xSEXP, SEXP propSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP rhoSEXP, SEXP combosSEXP, SEXP kSEXP, SEXP dfSEXP, SEXP lambdaSEXP, SEXP citermaxSEXP, SEXP tolSEXP, SEXP LASSOSEXP, SEXP boundSEXP) {
+RcppExport SEXP _CLIMB_cfconstr_pgmm(SEXP xSEXP, SEXP propSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP rhoSEXP, SEXP combosSEXP, SEXP kSEXP, SEXP dfSEXP, SEXP lambdaSEXP, SEXP citermaxSEXP, SEXP tolSEXP, SEXP LASSOSEXP, SEXP boundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -329,7 +329,7 @@ END_RCPP
 }
 // cduvnorm
 arma::colvec cduvnorm(arma::colvec x, double mu, double sigma);
-RcppExport SEXP _LIEB_cduvnorm(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
+RcppExport SEXP _CLIMB_cduvnorm(SEXP xSEXP, SEXP muSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -342,7 +342,7 @@ END_RCPP
 }
 // cmarg_ll_gmm
 double cmarg_ll_gmm(arma::mat& z, arma::mat mu, arma::mat sigma, arma::rowvec prop, arma::mat combos, int k);
-RcppExport SEXP _LIEB_cmarg_ll_gmm(SEXP zSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP propSEXP, SEXP combosSEXP, SEXP kSEXP) {
+RcppExport SEXP _CLIMB_cmarg_ll_gmm(SEXP zSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP propSEXP, SEXP combosSEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -358,7 +358,7 @@ END_RCPP
 }
 // cll_gmm
 double cll_gmm(arma::mat& z, arma::mat mu, arma::mat sigma, double rho, arma::rowvec prop, arma::mat combos, int k);
-RcppExport SEXP _LIEB_cll_gmm(SEXP zSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP rhoSEXP, SEXP propSEXP, SEXP combosSEXP, SEXP kSEXP) {
+RcppExport SEXP _CLIMB_cll_gmm(SEXP zSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP rhoSEXP, SEXP propSEXP, SEXP combosSEXP, SEXP kSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -375,37 +375,37 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LIEB_cgetPaths", (DL_FUNC) &_LIEB_cgetPaths, 1},
-    {"_LIEB_crowMatch", (DL_FUNC) &_LIEB_crowMatch, 2},
-    {"_LIEB_get_list_names", (DL_FUNC) &_LIEB_get_list_names, 1},
-    {"_LIEB_cpaste0", (DL_FUNC) &_LIEB_cpaste0, 1},
-    {"_LIEB_cstr_split", (DL_FUNC) &_LIEB_cstr_split, 2},
-    {"_LIEB_trans_func", (DL_FUNC) &_LIEB_trans_func, 1},
-    {"_LIEB_caccept", (DL_FUNC) &_LIEB_caccept, 2},
-    {"_LIEB_cget_prior_count", (DL_FUNC) &_LIEB_cget_prior_count, 6},
-    {"_LIEB_creduce_by_hamming", (DL_FUNC) &_LIEB_creduce_by_hamming, 4},
-    {"_LIEB_cget_true_assoc_idx", (DL_FUNC) &_LIEB_cget_true_assoc_idx, 2},
-    {"_LIEB_cassociate", (DL_FUNC) &_LIEB_cassociate, 3},
-    {"_LIEB_abs3", (DL_FUNC) &_LIEB_abs3, 1},
-    {"_LIEB_SCAD_1d", (DL_FUNC) &_LIEB_SCAD_1d, 4},
-    {"_LIEB_double_SCAD_1d", (DL_FUNC) &_LIEB_double_SCAD_1d, 3},
-    {"_LIEB_SCAD", (DL_FUNC) &_LIEB_SCAD, 4},
-    {"_LIEB_double_SCAD", (DL_FUNC) &_LIEB_double_SCAD, 3},
-    {"_LIEB_Mahalanobis", (DL_FUNC) &_LIEB_Mahalanobis, 3},
-    {"_LIEB_cdmvnorm", (DL_FUNC) &_LIEB_cdmvnorm, 3},
-    {"_LIEB_cget_constr_sigma", (DL_FUNC) &_LIEB_cget_constr_sigma, 4},
-    {"_LIEB_func_to_optim", (DL_FUNC) &_LIEB_func_to_optim, 4},
-    {"_LIEB_optim_rcpp", (DL_FUNC) &_LIEB_optim_rcpp, 4},
-    {"_LIEB_func_to_optim_bound", (DL_FUNC) &_LIEB_func_to_optim_bound, 5},
-    {"_LIEB_optim_rcpp_bound", (DL_FUNC) &_LIEB_optim_rcpp_bound, 5},
-    {"_LIEB_cfconstr_pgmm", (DL_FUNC) &_LIEB_cfconstr_pgmm, 13},
-    {"_LIEB_cduvnorm", (DL_FUNC) &_LIEB_cduvnorm, 3},
-    {"_LIEB_cmarg_ll_gmm", (DL_FUNC) &_LIEB_cmarg_ll_gmm, 6},
-    {"_LIEB_cll_gmm", (DL_FUNC) &_LIEB_cll_gmm, 7},
+    {"_CLIMB_cgetPaths", (DL_FUNC) &_CLIMB_cgetPaths, 1},
+    {"_CLIMB_crowMatch", (DL_FUNC) &_CLIMB_crowMatch, 2},
+    {"_CLIMB_get_list_names", (DL_FUNC) &_CLIMB_get_list_names, 1},
+    {"_CLIMB_cpaste0", (DL_FUNC) &_CLIMB_cpaste0, 1},
+    {"_CLIMB_cstr_split", (DL_FUNC) &_CLIMB_cstr_split, 2},
+    {"_CLIMB_trans_func", (DL_FUNC) &_CLIMB_trans_func, 1},
+    {"_CLIMB_caccept", (DL_FUNC) &_CLIMB_caccept, 2},
+    {"_CLIMB_cget_prior_count", (DL_FUNC) &_CLIMB_cget_prior_count, 6},
+    {"_CLIMB_creduce_by_hamming", (DL_FUNC) &_CLIMB_creduce_by_hamming, 4},
+    {"_CLIMB_cget_true_assoc_idx", (DL_FUNC) &_CLIMB_cget_true_assoc_idx, 2},
+    {"_CLIMB_cassociate", (DL_FUNC) &_CLIMB_cassociate, 3},
+    {"_CLIMB_abs3", (DL_FUNC) &_CLIMB_abs3, 1},
+    {"_CLIMB_SCAD_1d", (DL_FUNC) &_CLIMB_SCAD_1d, 4},
+    {"_CLIMB_double_SCAD_1d", (DL_FUNC) &_CLIMB_double_SCAD_1d, 3},
+    {"_CLIMB_SCAD", (DL_FUNC) &_CLIMB_SCAD, 4},
+    {"_CLIMB_double_SCAD", (DL_FUNC) &_CLIMB_double_SCAD, 3},
+    {"_CLIMB_Mahalanobis", (DL_FUNC) &_CLIMB_Mahalanobis, 3},
+    {"_CLIMB_cdmvnorm", (DL_FUNC) &_CLIMB_cdmvnorm, 3},
+    {"_CLIMB_cget_constr_sigma", (DL_FUNC) &_CLIMB_cget_constr_sigma, 4},
+    {"_CLIMB_func_to_optim", (DL_FUNC) &_CLIMB_func_to_optim, 4},
+    {"_CLIMB_optim_rcpp", (DL_FUNC) &_CLIMB_optim_rcpp, 4},
+    {"_CLIMB_func_to_optim_bound", (DL_FUNC) &_CLIMB_func_to_optim_bound, 5},
+    {"_CLIMB_optim_rcpp_bound", (DL_FUNC) &_CLIMB_optim_rcpp_bound, 5},
+    {"_CLIMB_cfconstr_pgmm", (DL_FUNC) &_CLIMB_cfconstr_pgmm, 13},
+    {"_CLIMB_cduvnorm", (DL_FUNC) &_CLIMB_cduvnorm, 3},
+    {"_CLIMB_cmarg_ll_gmm", (DL_FUNC) &_CLIMB_cmarg_ll_gmm, 6},
+    {"_CLIMB_cll_gmm", (DL_FUNC) &_CLIMB_cll_gmm, 7},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_LIEB(DllInfo *dll) {
+RcppExport void R_init_CLIMB(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
