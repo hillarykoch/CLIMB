@@ -121,7 +121,6 @@ extend_mcmc <- function(dat, hyp, nstep, retained_classes, mcmc) {
   JuliaCall::julia_assign("Psi0", hyp$Psi0)
   JuliaCall::julia_command("hyp = (kappa0, mu0, Psi0);")
   JuliaCall::julia_assign("alph", hyp$alpha)
-  # JuliaCall::julia_assign("reduced_classes", retained_classes)
 
   # Assign inputs names in Julia
   JuliaCall::julia_assign("nstep", nstep)
@@ -151,17 +150,17 @@ extract_chains <- function(mcmc) {
   mu_chains <- Sigma_chains <- list()
   for (m in 1:nm) {
     JuliaCall::julia_assign("mu_chains",
-                            JuliaCall::julia_eval("[get_mu_chain(chain, m) for m in 1:nm]"))
+                            JuliaCall::julia_eval("[cgibbs.get_mu_chain(chain, m) for m in 1:nm]"))
     JuliaCall::julia_assign("m", m)
     JuliaCall::julia_assign("m", JuliaCall::julia_eval("Int64(m)"))
 
     mu_chains[[m]] <- t(JuliaCall::julia_eval("mu_chains[m]"))
     Sigma_chains[[m]] <-
-      JuliaCall::julia_eval("get_Sigma_chain(chain, m)")
+      JuliaCall::julia_eval("cgibbs.get_Sigma_chain(chain, m)")
   }
 
-  z_chain <- JuliaCall::julia_eval("get_z_chain(chain);")
-  prop_chain <- t(JuliaCall::julia_eval("get_prop_chain(chain);"))
+  z_chain <- JuliaCall::julia_eval("cgibbs.get_z_chain(chain);")
+  prop_chain <- t(JuliaCall::julia_eval("cgibbs.get_prop_chain(chain);"))
 
   list(
     "mu_chains" = mu_chains,
