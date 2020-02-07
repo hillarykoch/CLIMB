@@ -152,11 +152,11 @@ extract_chains <- function(mcmc) {
 
   mu_chains <- Sigma_chains <- list()
   for (m in 1:nm) {
-    JuliaCall::julia_assign("mu_chains",
-                            JuliaCall::julia_eval("[cgibbs.get_mu_chain(chain, m) for m in 1:nm]"))
     JuliaCall::julia_assign("m", m)
     JuliaCall::julia_assign("m", JuliaCall::julia_eval("Int64(m)"))
-
+    
+    JuliaCall::julia_assign("mu_chains",
+                            JuliaCall::julia_eval("[cgibbs.get_mu_chain(chain, m) for m in 1:nm]"))
     mu_chains[[m]] <- t(JuliaCall::julia_eval("mu_chains[m]"))
     Sigma_chains[[m]] <-
       JuliaCall::julia_eval("cgibbs.get_Sigma_chain(chain, m)")
