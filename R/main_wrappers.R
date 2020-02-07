@@ -7,12 +7,12 @@ get_pairwise_fits <-
         combos <- combn(ncol(z), 2)
         n <- nrow(z)
         lambda <- sqrt(log(n)) * 10 ^ seq(-1, 0.5, length.out = nlambda)
-        
+
         if (parallel) {
             cluster <- makeCluster(ncores)
             registerDoParallel(cluster)
-            clusterEvalQ(cluster, library(LIEB))
-            
+            clusterEvalQ(cluster, library(CLIMB))
+
             fits <-
                 foreach(j = 1:ncol(combos), .packages = "foreach") %dopar% {
                     fconstr_pGMM(
@@ -38,7 +38,7 @@ get_pairwise_fits <-
         names(fits) <-
             apply(combos, 2, function(X)
                 paste(X, collapse =	"_"))
-        
+
         fits
     }
 
@@ -49,15 +49,15 @@ get_prior_weights <- function(reduced_classes, fits, parallel = FALSE, ncores = 
         delta <- 0:nrow(reduced_classes)
     }
     reduced_classes <- as.matrix(reduced_classes)
-    
+
     if(parallel) {
         cluster <- makeCluster(ncores)
         registerDoParallel(cluster)
-        clusterEvalQ(cluster, library(LIEB))
-        
+        clusterEvalQ(cluster, library(CLIMB))
+
         p <- foreach(delta = delta, .packages = "foreach") %dopar% {
             get_prior_prop(reduced_classes, fits, d, n, dist_tol = delta, MAP = FALSE)
-        }    
+        }
     } else {
         p <- lapply(delta, function(X) get_prior_prop(reduced_classes, fits, d, n, dist_tol = X, MAP = FALSE))
     }
@@ -67,26 +67,26 @@ get_prior_weights <- function(reduced_classes, fits, parallel = FALSE, ncores = 
 get_hyperparameters <- function(z, fits, reduced_classes, prior_weights) {
     n <- length(fits[[1]]$cluster)
     D <- as.numeric(strsplit(tail(names(fits),1), "_")[[1]][2])
-    
+
     labels <- purrr::map(fits, "post_prob") %>%
         lapply(function(X) apply(X, 1, function(Y) base::sample(1:ncol(X), size = 1, prob = Y)))
-    
+
     rc <- reduced_classes[prior_weights * n > D, ]
-    
+
     hyp <- get_hyperparams(fits, D, rc, z, clusters = labels, var_quantile = 0.75)
     for(i in 1:dim(hyp$Psi0)[3]) {
         idx <- diag(hyp$Psi0[,,i]) == 1
         subPsi <- hyp$Psi0[!idx, !idx, i]
         if(length(subPsi) > 1) {
             while(!(LaplacesDemon::is.positive.definite(subPsi))) {
-                subPsi <- subPsi + diag(nrow(subPsi))    
-            }    
+                subPsi <- subPsi + diag(nrow(subPsi))
+            }
         }
         hyp$Psi0[!idx, !idx, i] <- subPsi
     }
-    
+
     alpha <- prior_weights[prior_weights * n > D] / sum(prior_weights[prior_weights * n > D])
     kappa0 <- round(n * alpha)
-    
+
     list("Psi0" = hyp$Psi0, "mu0" = hyp$mu0, "alpha" = alpha, "kappa0" = kappa0)
 }
