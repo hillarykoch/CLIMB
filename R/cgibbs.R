@@ -106,6 +106,8 @@ run_mcmc <- function(dat, hyp, nstep, retained_classes) {
 
 
 extend_mcmc <- function(dat, hyp, nstep, retained_classes, mcmc) {
+  prepare_julia()
+
   dat <- data.frame(dat)
 
   # Compute some values from the inputs
@@ -131,7 +133,6 @@ extend_mcmc <- function(dat, hyp, nstep, retained_classes, mcmc) {
   JuliaCall::julia_assign("labels", apply(retained_classes + 1, 1, function(X)
     paste0(X, collapse = "")))
 
-  prepare_julia()
   out <-
     JuliaCall::julia_eval("cgibbs.extend_mcmc(dat, chain, tune_df_chain, hyp, alph, nstep, labels);")
   names(out) <- c("chain", "acceptance_rate_chain", "tune_df_chain")
@@ -139,6 +140,8 @@ extend_mcmc <- function(dat, hyp, nstep, retained_classes, mcmc) {
 }
 
 extract_chains <- function(mcmc) {
+  prepare_julia()
+
   acceptance_rate_chain <- t(mcmc$acceptance_rate_chain)
   tune_df_chain <- t(mcmc$tune_df_chain)
   nm <- ncol(acceptance_rate_chain)
