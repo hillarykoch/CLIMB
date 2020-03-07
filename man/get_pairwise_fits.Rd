@@ -3,7 +3,7 @@
 \title{Fit all D choose 2 pairwise models to D-dimensional data}
 \description{This is the first step of the CLIMB procedure. It fits a penalized constrained normal mixture model to D-dimensional data, automatically selecting the number of clusters in each pairwise fit. This can be parallelized across up to D choose 2 cores.}
 \usage{
-get_pairwise_fits(z, nlambda = 10, parallel = TRUE, ncores = 10, bound = 0)
+get_pairwise_fits(z, nlambda = 10, parallel = TRUE, ncores = 10, bound = 0, flex_mu = FALSE)
 }
 \arguments{
   \item{z}{n by D matrix or data frame of appropriately pre-processed observations.}
@@ -11,6 +11,7 @@ get_pairwise_fits(z, nlambda = 10, parallel = TRUE, ncores = 10, bound = 0)
   \item{parallel}{Boolean. Should the analysis be executed in parallel?}
   \item{ncores}{Integer. If parallel=TRUE, number of cores to parallelize over.}
   \item{bound}{Numeric. Is there a minimum value for the mean of the non-null distribution?}
+  \item{flex_mu}{Logical. If true, relax constraints on mu.}
 }
 \details{CLIMB automatically determines an optimal grid of lambdas, given a number of lambdas. In all analyses in the original CLIMB paper, bound was always set to 0.}
 \value{

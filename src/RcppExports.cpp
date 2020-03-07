@@ -373,6 +373,107 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// get_mu_optim
+arma::colvec get_mu_optim(arma::mat mu_in, arma::mat combos);
+RcppExport SEXP _CLIMB_get_mu_optim(SEXP mu_inSEXP, SEXP combosSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type mu_in(mu_inSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type combos(combosSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_mu_optim(mu_in, combos));
+    return rcpp_result_gen;
+END_RCPP
+}
+// func_to_optim0
+double func_to_optim0(const arma::colvec& init_val, const arma::mat& x, const arma::mat& h_est, const arma::mat& combos, const int& a, const arma::uvec& negidx);
+RcppExport SEXP _CLIMB_func_to_optim0(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP aSEXP, SEXP negidxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::colvec& >::type init_val(init_valSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type h_est(h_estSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type combos(combosSEXP);
+    Rcpp::traits::input_parameter< const int& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type negidx(negidxSEXP);
+    rcpp_result_gen = Rcpp::wrap(func_to_optim0(init_val, x, h_est, combos, a, negidx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// optim0_rcpp
+arma::vec optim0_rcpp(const arma::vec& init_val, arma::mat& x, arma::mat& h_est, arma::mat& combos, int& a, arma::uvec& negidx);
+RcppExport SEXP _CLIMB_optim0_rcpp(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP aSEXP, SEXP negidxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type init_val(init_valSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type h_est(h_estSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type combos(combosSEXP);
+    Rcpp::traits::input_parameter< int& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::uvec& >::type negidx(negidxSEXP);
+    rcpp_result_gen = Rcpp::wrap(optim0_rcpp(init_val, x, h_est, combos, a, negidx));
+    return rcpp_result_gen;
+END_RCPP
+}
+// func_to_optim0_bound
+double func_to_optim0_bound(const arma::colvec& init_val, const arma::mat& x, const arma::mat& h_est, const arma::mat& combos, const int& a, const arma::uvec& negidx, double& bound);
+RcppExport SEXP _CLIMB_func_to_optim0_bound(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP aSEXP, SEXP negidxSEXP, SEXP boundSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::colvec& >::type init_val(init_valSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type h_est(h_estSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type combos(combosSEXP);
+    Rcpp::traits::input_parameter< const int& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type negidx(negidxSEXP);
+    Rcpp::traits::input_parameter< double& >::type bound(boundSEXP);
+    rcpp_result_gen = Rcpp::wrap(func_to_optim0_bound(init_val, x, h_est, combos, a, negidx, bound));
+    return rcpp_result_gen;
+END_RCPP
+}
+// optim0_rcpp_bound
+arma::vec optim0_rcpp_bound(const arma::vec& init_val, arma::mat& x, arma::mat& h_est, arma::mat& combos, int& a, arma::uvec& negidx, double& bound);
+RcppExport SEXP _CLIMB_optim0_rcpp_bound(SEXP init_valSEXP, SEXP xSEXP, SEXP h_estSEXP, SEXP combosSEXP, SEXP aSEXP, SEXP negidxSEXP, SEXP boundSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type init_val(init_valSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type h_est(h_estSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type combos(combosSEXP);
+    Rcpp::traits::input_parameter< int& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< arma::uvec& >::type negidx(negidxSEXP);
+    Rcpp::traits::input_parameter< double& >::type bound(boundSEXP);
+    rcpp_result_gen = Rcpp::wrap(optim0_rcpp_bound(init_val, x, h_est, combos, a, negidx, bound));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cfconstr0_pGMM
+Rcpp::List cfconstr0_pGMM(arma::mat& x, arma::rowvec prop, arma::mat mu, arma::mat sigma, double rho, arma::mat combos, int k, arma::rowvec df, int lambda, int citermax, double tol, unsigned int LASSO, double bound);
+RcppExport SEXP _CLIMB_cfconstr0_pGMM(SEXP xSEXP, SEXP propSEXP, SEXP muSEXP, SEXP sigmaSEXP, SEXP rhoSEXP, SEXP combosSEXP, SEXP kSEXP, SEXP dfSEXP, SEXP lambdaSEXP, SEXP citermaxSEXP, SEXP tolSEXP, SEXP LASSOSEXP, SEXP boundSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type prop(propSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< double >::type rho(rhoSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type combos(combosSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type df(dfSEXP);
+    Rcpp::traits::input_parameter< int >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type citermax(citermaxSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type LASSO(LASSOSEXP);
+    Rcpp::traits::input_parameter< double >::type bound(boundSEXP);
+    rcpp_result_gen = Rcpp::wrap(cfconstr0_pGMM(x, prop, mu, sigma, rho, combos, k, df, lambda, citermax, tol, LASSO, bound));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_CLIMB_cgetPaths", (DL_FUNC) &_CLIMB_cgetPaths, 1},
@@ -402,6 +503,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_CLIMB_cduvnorm", (DL_FUNC) &_CLIMB_cduvnorm, 3},
     {"_CLIMB_cmarg_ll_gmm", (DL_FUNC) &_CLIMB_cmarg_ll_gmm, 6},
     {"_CLIMB_cll_gmm", (DL_FUNC) &_CLIMB_cll_gmm, 7},
+    {"_CLIMB_get_mu_optim", (DL_FUNC) &_CLIMB_get_mu_optim, 2},
+    {"_CLIMB_func_to_optim0", (DL_FUNC) &_CLIMB_func_to_optim0, 6},
+    {"_CLIMB_optim0_rcpp", (DL_FUNC) &_CLIMB_optim0_rcpp, 6},
+    {"_CLIMB_func_to_optim0_bound", (DL_FUNC) &_CLIMB_func_to_optim0_bound, 7},
+    {"_CLIMB_optim0_rcpp_bound", (DL_FUNC) &_CLIMB_optim0_rcpp_bound, 7},
+    {"_CLIMB_cfconstr0_pGMM", (DL_FUNC) &_CLIMB_cfconstr0_pGMM, 13},
     {NULL, NULL, 0}
 };
 

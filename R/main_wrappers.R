@@ -3,7 +3,8 @@ get_pairwise_fits <-
              nlambda = 10,
              parallel = TRUE,
              ncores = 10,
-             bound = 0.0) {
+             bound = 0.0,
+             flex_mu = FALSE) {
         combos <- combn(ncol(z), 2)
         n <- nrow(z)
         lambda <- sqrt(log(n)) * 10 ^ seq(-1, 0.5, length.out = nlambda)
@@ -12,9 +13,36 @@ get_pairwise_fits <-
             cluster <- makeCluster(ncores)
             registerDoParallel(cluster)
             clusterEvalQ(cluster, library(CLIMB))
-
-            fits <-
-                foreach(j = 1:ncol(combos), .packages = "foreach") %dopar% {
+            
+            if(!flex_mu) {
+                fits <-
+                    foreach(j = 1:ncol(combos), .packages = "foreach") %dopar% {
+                        fconstr_pGMM(
+                            x = z[, combos[, j]],
+                            lambda = lambda,
+                            tol = 1e-04,
+                            itermax = 200,
+                            penaltyType = "SCAD",
+                            bound = bound
+                        )
+                    }    
+            } else {
+                fits <-
+                    foreach(j = 1:ncol(combos), .packages = "foreach") %dopar% {
+                        fconstr0_pGMM(
+                            x = z[, combos[, j]],
+                            lambda = lambda,
+                            tol = 1e-04,
+                            itermax = 200,
+                            penaltyType = "SCAD",
+                            bound = bound
+                        )
+                    }    
+            }
+            
+        } else {
+            if(!flex_mu) {
+                fits <- lapply(1:ncol(combos), function(j)
                     fconstr_pGMM(
                         x = z[, combos[, j]],
                         lambda = lambda,
@@ -22,18 +50,18 @@ get_pairwise_fits <-
                         itermax = 200,
                         penaltyType = "SCAD",
                         bound = bound
-                    )
-                }
-        } else {
-            fits <- lapply(1:ncol(combos), function(j)
-                fconstr_pGMM(
-                    x = z[, combos[, j]],
-                    lambda = lambda,
-                    tol = 1e-04,
-                    itermax = 200,
-                    penaltyType = "SCAD",
-                    bound = bound
-                ))
+                    ))    
+            } else {
+                fits <- lapply(1:ncol(combos), function(j)
+                    fconstr0_pGMM(
+                        x = z[, combos[, j]],
+                        lambda = lambda,
+                        tol = 1e-04,
+                        itermax = 200,
+                        penaltyType = "SCAD",
+                        bound = bound
+                    ))    
+            }
         }
         names(fits) <-
             apply(combos, 2, function(X)

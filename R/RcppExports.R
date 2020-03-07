@@ -109,3 +109,27 @@ cll_gmm <- function(z, mu, sigma, rho, prop, combos, k) {
     .Call(`_CLIMB_cll_gmm`, z, mu, sigma, rho, prop, combos, k)
 }
 
+get_mu_optim <- function(mu_in, combos) {
+    .Call(`_CLIMB_get_mu_optim`, mu_in, combos)
+}
+
+func_to_optim0 <- function(init_val, x, h_est, combos, a, negidx) {
+    .Call(`_CLIMB_func_to_optim0`, init_val, x, h_est, combos, a, negidx)
+}
+
+optim0_rcpp <- function(init_val, x, h_est, combos, a, negidx) {
+    .Call(`_CLIMB_optim0_rcpp`, init_val, x, h_est, combos, a, negidx)
+}
+
+func_to_optim0_bound <- function(init_val, x, h_est, combos, a, negidx, bound) {
+    .Call(`_CLIMB_func_to_optim0_bound`, init_val, x, h_est, combos, a, negidx, bound)
+}
+
+optim0_rcpp_bound <- function(init_val, x, h_est, combos, a, negidx, bound) {
+    .Call(`_CLIMB_optim0_rcpp_bound`, init_val, x, h_est, combos, a, negidx, bound)
+}
+
+cfconstr0_pGMM <- function(x, prop, mu, sigma, rho, combos, k, df, lambda, citermax, tol, LASSO, bound = 0.0) {
+    .Call(`_CLIMB_cfconstr0_pGMM`, x, prop, mu, sigma, rho, combos, k, df, lambda, citermax, tol, LASSO, bound)
+}
+

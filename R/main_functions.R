@@ -114,3 +114,103 @@ r_assoc <- function(d, num_patterns) {
     }
   combos
 }
+
+# generate data for second constrained version of GMCM
+rconstr0_GMM <-
+    function(n, prop, mu, sigma, rho, d, combos = NULL) {
+        # n: sample size
+        # prop: mixing proportion of each cluster
+        # d: dimension of data (number of replicates)
+        # mu: mean of "reproducible" components
+        #        a 2-vector for negative, positive association
+        # sigma: variance of "reproducible" components,
+        #        a 2-vector for negative, positive association
+        # rho: correlation between replicates of same component
+        #        a 3-vector for negative, cross, positive association
+        # d: number of replicates
+        # k: number of clusters
+        
+        # Generate all combinations of replication, given in any order
+        if (is.null(combos)) {
+            combos <- expand.grid(rep(list(-1:1), d)) %>% as.matrix
+        }
+        
+        k <- nrow(combos)
+        if (k != length(prop)) {
+            stop("length(prop) must be equal to total number of clusters.")
+        }
+        
+        if (length(mu) != 2) {
+            stop("length(mu) must equal 2.")
+        }
+        if (mu[1] >= 0 | mu[2] <= 0) {
+            stop("mu[1] must be < 0 and mu[2] must be >= 0.")
+        }
+        if (length(sigma) != 2) {
+            stop("length(sigma) must equal 2.")
+        }
+        if (any(sigma <= 0)) {
+            stop("elements of sigma must be positive.")
+        }
+        if (length(rho) != 3) {
+            stop("length(rho) must equal 3.")
+        }
+        if (rho[1] < 0 | rho[3] < 0 | rho[2] > 0) {
+            stop("rho[1] and rho[3] must be >= 0, rho[2] must be <= 0.")
+        }
+        
+        sigma <- c(sigma[1], 1, sigma[2])
+        mu <- c(mu[1], 0, mu[2])
+        prop <- prop / sum(prop)
+        
+        mu_combos <- replace(combos, combos == -1, mu[1]) %>%
+            replace(combos == 1, mu[3]) %>%
+            as.matrix
+        sig_combos <- replace(combos, combos == -1, sigma[1]) %>%
+            replace(combos == 1, sigma[3]) %>%
+            replace(combos == 0, 1) %>%
+            as.matrix
+        rho_combos <- rep(0, k) %>%
+            replace(apply(combos, 1, sum) == -2, rho[1]) %>%
+            replace(apply(combos, 1, sum) == 0 &
+                        !apply(combos, 1, function(X)
+                            any(X == 0)),
+                    rho[2]) %>%
+            replace(apply(combos, 1, sum) == 2, rho[3])
+        
+        if (sum(prop == 0) > 0) {
+            keepidx <- prop != 0
+            combos <- combos[keepidx, ]
+            prop <- prop[keepidx]
+            k <- sum(keepidx)
+        }
+        
+        rles <- sample(seq_along(prop), n, replace = TRUE, prob = prop) %>%
+            sort %>%
+            rle
+        num <- rep(0, k)
+        num[rles$values] <- rles$lengths
+        tag <- rep.int(1:k, times = num)
+        
+        y <- lapply(seq_along(prop),
+                    function(X)
+                        if(num[X] > 0) {
+                            rmvnorm(
+                                num[X],
+                                mean = mu_combos[X, ],
+                                sigma =
+                                    get_constr0_sigma(sig_combos[X,],
+                                                      combos[X,],
+                                                      rho)
+                            )}) %>%
+            abind(along = 1) %>%
+            data.frame %>%
+            setNames(sapply(seq(d), function(X)
+                paste0("y.", X)))
+        
+       
+        list(
+            "data" = y,
+            "cluster" = tag
+        )
+    }
