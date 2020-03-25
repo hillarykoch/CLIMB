@@ -10,6 +10,9 @@ get_pairwise_fits <-
         lambda <- sqrt(log(n)) * 10 ^ seq(-1, 0.5, length.out = nlambda)
 
         if (parallel) {
+            if(ncores > ncol(combos)) {
+                warning("You are requesting more cores than this analysis requires.")
+            }
             cluster <- makeCluster(ncores)
             registerDoParallel(cluster)
             clusterEvalQ(cluster, library(CLIMB))
