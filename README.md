@@ -3,7 +3,7 @@
 ## Dependencies
 1.  To use the full extent of this package, you need to download the C++ library LEMON graph library; [download it here.](https://lemon.cs.elte.hu/trac/lemon/wiki/Downloads)
 
-If you do not have them already, you do not need all of LEMON's dependencies to run the pGMCM package. To ease this during configuring LEMON, you can go into the INSTALL file after downloading LEMON and add options
+If you do not have them already, you do not need all of LEMON's dependencies to run the CLIMB package. To ease this during configuring LEMON, you can go into the INSTALL file after downloading LEMON and add options
 
 ```
 -DLEMON_ENABLE_GLPK=NO
