@@ -4,7 +4,8 @@ get_pairwise_fits <-
              parallel = TRUE,
              ncores = 10,
              bound = 0.0,
-             flex_mu = FALSE) {
+             flex_mu = FALSE,
+             ...) {
         combos <- combn(ncol(z), 2)
         n <- nrow(z)
         lambda <- sqrt(log(n)) * 10 ^ seq(-1, 0.5, length.out = nlambda)
@@ -77,7 +78,7 @@ get_prior_weights <- function(reduced_classes, fits, parallel = FALSE, ncores = 
     n <- length(fits[[1]]$cluster)
     d <- ncol(reduced_classes)
     if(is.null(delta)) {
-        delta <- 0:nrow(reduced_classes)
+        delta <- 0:choose(d,2)
     }
     reduced_classes <- as.matrix(reduced_classes)
 

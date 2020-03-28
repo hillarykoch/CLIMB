@@ -20,7 +20,7 @@ Balázs Dezső, Alpár Jüttner, Péter Kovács. LEMON – an Open Source C++ Gr
     *   GCC: [see here, for example](https://www.gnu.org/software/gcc/projects/cxx-status.html#cxx11)
     *   clang: [see here](http://clang.llvm.org/cxx_status.html)
     
-3. You also need a more recent version of the Julia programming language, version >= 1.0:
+    3. You also need a more recent version of the Julia programming language, version >= 1.0 (**CLIMB was developed with Julia version 1.0.2**):
     *   Download Julia [here](https://julialang.org/downloads/)
     *   Or, if you have Homebrew, from the terminal you can type
     ```console
@@ -35,4 +35,4 @@ This package is currently only maintained on GitHub. To download just the R pack
 library(devtools)
 install_github("hillarykoch/CLIMB")
 library(CLIMB)
-``
+```
