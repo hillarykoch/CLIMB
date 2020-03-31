@@ -36,3 +36,5 @@ library(devtools)
 install_github("hillarykoch/CLIMB")
 library(CLIMB)
 ```
+## Using the package
+There is a preliminary manual describing how to implement the CLIMB methodology [here](https://hillarykoch.github.io/climb_page/index.html).
