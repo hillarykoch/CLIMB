@@ -174,7 +174,7 @@ get_row_reordering <- function(row_clustering, chain, burnin) {
 
 test_consistency <- function(chain,
                              burnin,
-                             u,
+                             u = NULL,
                              b = 0.5,
                              with_zero = FALSE,
                              agnostic_to_sign = FALSE) {
