@@ -1,3 +1,9 @@
+# Get most likely class label based on posterior samples
+get_MAP_z <- function(chain, burnin) {
+  rles <- apply(chain$z_chain[,-burnin], 1, function(X) rle(sort(X)))
+  z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+}
+
 # Computes pairwise KL distance between 2 MVNs
 get_KL_distance <- function(mu1, mu2, Sigma1, Sigma2) {
     k <- nrow(Sigma1)
@@ -13,14 +19,12 @@ merge_classes <- function(n_groups, chain, burnin) {
         as.matrix %>%
         unname
     prop <- colMeans(chain$prop_chain[-burnin, ])
-    z_chain <- chain$z_chain[, -burnin]
     sig_ests <-
         map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>% simplify2array
+    z <- get_MAP_z(chain, burnin)
     nm <- ncol(mu)
     dm <- nrow(mu)
 
-    rles <- apply(z_chain, 1, function(X) rle(sort(X)))
-    z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
 
     cluster_dist <- matrix(0, nm, nm)
     combos <- combn(unique(z), 2)
@@ -128,9 +132,42 @@ compute_distances_between_clusters <- function(chain, burnin) {
         Sigma2 = sig_ests[, , combos[2, i]]
       )
   }
-  rownames(cluster_dist) <- colnames(cluster_dist) <- 1:nm
   rmidx <- rowSums(cluster_dist) == 0
+  cluster_dist <- cluster_dist[!rmidx, !rmidx]
 
+  labels <- apply(sign(mu[,!rmidx]), 2, function(X)
+    paste0("(", paste0(X, collapse = ","), ")"))
 
-  cluster_dist[!rmidx, !rmidx]
+  rownames(cluster_dist) <- colnames(cluster_dist) <- labels
+
+  cluster_dist
+}
+
+# Get row reordering (for bi-clustering heatmaps)
+get_row_reordering <- function(row_clustering, chain, burnin) {
+  # Get MAP class labels based on posterior samples
+  z <- get_MAP_z(chain, burnin)
+
+  # cluster number
+  nm <- length(row_clustering$order)
+
+  # Get a row label based on row clustering
+  newz <- z
+  count <- 1
+  for (i in seq(nm)) {
+    idx <- z == row_clustering$order[i]
+    if (sum(idx) > 0) {
+      if (sum(idx) > 1) {
+        reord <-
+          hclust(as.dist(sqrt(1 - cor(
+            t(dat[idx,]), method = "pearson"
+          ) ^ 2)))$order
+        newz[idx] <- (count:(count + sum(idx) - 1))[reord]
+      } else {
+        newz[idx] <- count:(count + sum(idx) - 1)
+      }
+      count <- count + sum(idx)
+    }
+  }
+  newz
 }
