@@ -171,3 +171,63 @@ get_row_reordering <- function(row_clustering, chain, burnin) {
   }
   newz
 }
+
+test_consistency <- function(chain,
+                             burnin,
+                             u,
+                             b = 0.5,
+                             with_zero = FALSE,
+                             agnostic_to_sign = FALSE) {
+  z_chain <- chain$z_chain[,-burnin]
+  labs <- map(chain$mu_chains, ~ sign(.x[1,])) %>%
+    do.call(`rbind`, .)
+  n <- nrow(z_chain)
+  D <- ncol(labs)
+
+  if(with_zero & !is.null(u)) {
+    warning("Testing consistency and including the null class, but a threshold u was specified. Ignoring u and setting u = D.")
+  }
+
+  if(u > D) {
+    stop("u cannot be greater than the dimension of the data.")
+  }
+
+  if(agnostic_to_sign) {
+    labs <- abs(labs)
+  }
+
+  # Testing for consistency across all dimensions
+  if(with_zero) {
+    # Find labels where all entries are equal
+    consistent_lab_idx <- apply(labs, 1, function(X) diff(range(X)) == 0)
+
+    # If there are no consistent labels, there are no consistent observations
+    if(sum(consistent_lab_idx) == 0) {
+      return(rep(FALSE, n))
+    }
+
+    consistent_lab_idx <- which(consistent_lab_idx)
+  } else { # Testing for replicability of a signal
+
+    consistent_pos_lab_idx <- apply(labs, 1, function(X) sum(X == 1) >= u)
+    consistent_neg_lab_idx <- apply(labs, 1, function(X) sum(X == -1) >= u)
+
+    # If there are no consistent labels, there are no consistent observations
+    if(sum(consistent_pos_lab_idx) == 0 & sum(consistent_neg_lab_idx) == 0) {
+      return(rep(FALSE, n))
+    }
+
+    consistent_lab_idx <-
+      sort(unique(c(
+        which(consistent_neg_lab_idx),
+        which(consistent_pos_lab_idx)
+      )))
+  }
+
+  # Find probabilities that each observation is assigned a consistent label
+  consistent_prob <-
+    colMeans(apply(z_chain, 1, function(X)
+      X %in% consistent_lab_idx))
+
+  consistent_prob > b
+}
