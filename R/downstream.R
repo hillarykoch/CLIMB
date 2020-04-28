@@ -198,6 +198,8 @@ test_consistency <- function(chain,
 
   # Testing for consistency across all dimensions
   if(with_zero) {
+    u <- D
+
     # Find labels where all entries are equal
     consistent_lab_idx <- apply(labs, 1, function(X) diff(range(X)) == 0)
 
