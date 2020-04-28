@@ -188,9 +188,12 @@ test_consistency <- function(chain,
     warning("Testing consistency and including the null class, but a threshold u was specified. Ignoring u and setting u = D.")
   }
 
-  if(u > D) {
-    stop("u cannot be greater than the dimension of the data.")
+  if(!is.null(u)) {
+    if(u > D) {
+      stop("u cannot be greater than the dimension of the data.")
+    }
   }
+
 
   if(agnostic_to_sign) {
     labs <- abs(labs)
