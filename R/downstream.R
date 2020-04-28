@@ -18,10 +18,9 @@ merge_classes <- function(n_groups, chain, burnin) {
         map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>% simplify2array
     nm <- ncol(mu)
     dm <- nrow(mu)
-    z <-
-        apply(z_chain, 1, function(X)
-            rle(sort(X))$values[which.max(rle(sort(X))$lengths)])
 
+    rles <- apply(z_chain, 1, function(X) rle(sort(X)))
+    z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
 
     cluster_dist <- matrix(0, nm, nm)
     combos <- combn(unique(z), 2)
@@ -95,4 +94,43 @@ compute_distances_between_conditions <- function(chain, burnin) {
 
   # Convert to distance
   sqrt(1-(weighted_corrs) ^ 2)
+}
+
+
+# Clustering the rows
+compute_distances_between_clusters <- function(chain, burnin) {
+  # Get parameter estimates after burn-in
+  mu <- map(chain$mu_chains, ~ colMeans(.x[-burnin, ])) %>%
+    bind_cols() %>%
+    as.matrix %>%
+    unname
+  prop <- colMeans(chain$prop_chain[-burnin, ])
+  z_chain <- chain$z_chain[, -burnin]
+  sig_ests <-
+    map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>%
+    simplify2array
+  nm <- ncol(mu)
+  dm <- nrow(mu)
+
+  rles <- apply(z_chain, 1, function(X) rle(sort(X)))
+  z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+
+
+  cluster_dist <- matrix(0, nm, nm)
+  combos <- combn(unique(z), 2)
+  for (i in 1:ncol(combos)) {
+    cluster_dist[combos[1, i], combos[2, i]] <-
+      cluster_dist[combos[2, i], combos[1, i]] <-
+      get_KL_distance(
+        mu1 = mu[, combos[1, i]],
+        mu2 =  mu[, combos[2, i]],
+        Sigma1 = sig_ests[, , combos[1, i]],
+        Sigma2 = sig_ests[, , combos[2, i]]
+      )
+  }
+  rownames(cluster_dist) <- colnames(cluster_dist) <- 1:nm
+  rmidx <- rowSums(cluster_dist) == 0
+
+
+  cluster_dist[!rmidx, !rmidx]
 }
