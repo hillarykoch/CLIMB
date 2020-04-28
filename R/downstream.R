@@ -234,5 +234,11 @@ test_consistency <- function(chain,
     colMeans(apply(z_chain, 1, function(X)
       X %in% consistent_lab_idx))
 
-  consistent_prob > b
+  if(length(b) == 1) {
+    return(consistent_prob > b)
+  } else {
+    replicable <- map(b, ~ consistent_prob > .x) %>%
+      set_names(paste(b))
+    return(replicable)
+  }
 }
