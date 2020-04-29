@@ -37,4 +37,4 @@ install_github("hillarykoch/CLIMB")
 library(CLIMB)
 ```
 ## Using the package
-There is a preliminary manual describing how to implement the CLIMB methodology [here](https://hillarykoch.github.io/climb_page/index.html).
+There is a manual walking through how to prepare your data, implement the CLIMB methodology, and perform some downstream analyses [here](https://hillarykoch.github.io/climb_page/index.html).
