@@ -95,7 +95,7 @@ fconstr_pGMM <-
                   init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] < 0) %>% abs) %>%
             mean %>%
             max(.1) %>%
-            min(sigma0-.00001) %>%
+            min(sigma0 / 2) %>%
             matrix
 
         if (sum(prop0 == 0) > 0) {
@@ -235,8 +235,10 @@ fconstr0_pGMM <-
                   init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] < 0) %>% abs) %>%
             mean %>%
             max(.1) %>%
-            min(sigma0-.00001) %>%
+            min(sigma0 / 2) %>%
             matrix
+        print(rho0)
+        print(sigma0)
         
         # Eliminate empty clusters
         if (sum(prop0 == 0) > 0) {

@@ -766,6 +766,7 @@ Rcpp::List cfconstr0_pGMM(arma::mat& x,
     arma::rowvec prop_new;
     double thresh = 1E-03;
 
+
     for(int step = 0; step < citermax; ++step) {
         // E step
         for(int i = 0; i < k; ++i) {
@@ -790,21 +791,23 @@ Rcpp::List cfconstr0_pGMM(arma::mat& x,
         // M step
         // update mean and variance covariance with numerical optimization
         arma::colvec sgn_mu_in = get_mu_optim(mu_old, combos);
+
         arma::uvec negidx = find(sgn_mu_in < 0);
-        
         arma::uvec repidx = find(combos, 0);
+
         int idx = repidx(0);
         double sigma_in = sigma_old(idx);
         int a = sgn_mu_in.n_rows;
 
         init_val.set_size(a + 2);
         init_val.subvec(0,a-1) = log(abs(sgn_mu_in));
+
         init_val(a) = log(sigma_in);
         init_val(a + 1) = rho_old;
 
         // Optimize using optim
         param_new.copy_size(init_val);
-        param_new = optim0_rcpp(init_val, x, h_est, combos, a, negidx);
+        //param_new = optim0_rcpp(init_val, x, h_est, combos, a, negidx);
 
         if(bound == 0.0) {
             param_new = optim0_rcpp(init_val, x, h_est, combos, a, negidx);
