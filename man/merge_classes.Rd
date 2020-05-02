@@ -20,4 +20,6 @@ merge_classes(n_groups, chain, burnin)
     \item{merged_prop}{Merged class mixing weights.}
     \item{An object output from \link[stats]{hclust}, showing hierarchical relationship among the non-empty classes.}
 }
-\author{\email{hbk5086@psu.edu}}
+\author{
+    \email{hbk5086@psu.edu}
+}
