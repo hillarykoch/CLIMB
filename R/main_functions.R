@@ -237,3 +237,37 @@ rconstr0_GMM <-
                     "prop" = prop)
         )
     }
+
+
+
+# Calculate variance covariance matrix for constrained GMCM
+get_constr_sigma <- function(Sigma, rho, idx) {
+    for (i in 1:(nrow(Sigma) - 1)) {
+        for (j in (i + 1):ncol(Sigma)) {
+            if (idx[i] == idx[j] & idx[i] != 0) {
+                Sigma[i, j] <- Sigma[j, i] <- rho
+            } else if (idx[i] == -idx[j] & idx[i] != 0) {
+                Sigma[i, j] <- Sigma[j, i] <- -rho
+            }
+        }
+    }
+    Sigma
+}
+
+# Calculate variance covariance matrix for constrained0 GMCM
+get_constr0_sigma <- function(diagonal, combos_row, rho) {
+    Sigma <- diag(diagonal)
+    for (i in 1:(nrow(Sigma) - 1)) {
+        for (j in (i + 1):ncol(Sigma)) {
+            if (combos_row[i] == -1 & combos_row[j] == -1) {
+                Sigma[i, j] <- Sigma[j, i] <- rho[1]
+            } else if (combos_row[i] == 1 & combos_row[j] == 1) {
+                Sigma[i, j] <- Sigma[j, i] <- rho[3]
+            } else if ((combos_row[i] + combos_row[j]) == 0 &
+                       combos_row[i] != 0) {
+                Sigma[i, j] <- Sigma[j, i] <- rho[2]
+            }
+        }
+    }
+    Sigma
+}
