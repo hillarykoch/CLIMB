@@ -14,11 +14,12 @@ rconstr0_GMM(n, prop, mu, sigma, rho, d, combos = NULL)
     \item{sigma}{Numeric 2-vector corresponding to the variances of the negative, positive association components.}
     \item{rho}{Numeric 3-vector corresponding to the correlation between two negative/cross/two possitive components. The first and third elements must be positive, the second must be negative.}
     \item{d}{Number of replicates.}
-    \item{d}{M by d ternary matrix determining which association labels to retain (defaults to all possible configurations).}
+    \item{combos}{M by d ternary matrix determining which association labels to retain (defaults to all possible configurations).}
 }
 \value{
     \item{data}{An n by d numeric matrix of simulated multivariate normal data, where d is the dimension of the data.}
     \item{cluster}{Integer vector of the true cluster labels.}
+    \item{params}{List of parameters supplied for simulation.}
 }
 \author{\email{hbk5086@psu.edu}}
 \seealso{\link{rGMM}, \link{rconstr_GMM}}
