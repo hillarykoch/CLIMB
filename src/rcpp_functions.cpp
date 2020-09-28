@@ -396,8 +396,8 @@ Rcpp::List cfconstr_pgmm(arma::mat& x,
             term = accu((SCAD_1d(prop, lambda, k) % prop_old) % (1 / (1E-06 + SCAD(prop, lambda, k))));
             for(int i = 0; i < k; ++i) {
                 prop_new(i) = sum(h_est.col(i)) /
-                    (n - (double_SCAD_1d(prop_old(i), lambda) / (1E-06 + double_SCAD(prop_old(i), lambda)) +
-                        term) * lambda * df(i)) * 1.0L;
+                    (n + (double_SCAD_1d(prop_old(i), lambda) / (1E-06 + double_SCAD(prop_old(i), lambda)) -
+                        term) * lambda * df(i) * n) * 1.0L;
                 if(prop_new(i) < thresh) // tolerance greater than 0 for numerical stability (Huang2013)
                     prop_new(i) = 0;
             }
@@ -838,8 +838,8 @@ Rcpp::List cfconstr0_pGMM(arma::mat& x,
             term = accu((SCAD_1d(prop, lambda, k) % prop_old) % (1 / (1E-06 + SCAD(prop, lambda, k))));
             for(int i = 0; i < k; ++i) {
                 prop_new(i) = sum(h_est.col(i)) /
-                    (n - (double_SCAD_1d(prop_old(i), lambda) / (1E-06 + double_SCAD(prop_old(i), lambda)) +
-                        term) * lambda * df(i)) * 1.0L;
+                    (n + (double_SCAD_1d(prop_old(i), lambda) / (1E-06 + double_SCAD(prop_old(i), lambda)) -
+                        term) * lambda * df(i) * n) * 1.0L;
                 if(prop_new(i) < thresh) {
                     prop_new(i) = 0;
                 }
