@@ -21,6 +21,7 @@ get_pairwise_fits <-
             if(!flex_mu) {
                 fits <-
                     foreach(j = 1:ncol(combos), .packages = "foreach") %dopar% {
+                        tryCatch(expr =
                         fconstr_pGMM(
                             x = z[, combos[, j]],
                             lambda = lambda,
@@ -28,11 +29,12 @@ get_pairwise_fits <-
                             itermax = 200,
                             penaltyType = "SCAD",
                             bound = bound
-                        )
+                        ), error = function(e) NA)
                     }    
             } else {
                 fits <-
                     foreach(j = 1:ncol(combos), .packages = "foreach") %dopar% {
+                        tryCatch(expr =
                         fconstr0_pGMM(
                             x = z[, combos[, j]],
                             lambda = lambda,
@@ -40,13 +42,14 @@ get_pairwise_fits <-
                             itermax = 200,
                             penaltyType = "SCAD",
                             bound = bound
-                        )
+                        ), error = function(e) NA)
                     }    
             }
             
         } else {
             if(!flex_mu) {
                 fits <- lapply(1:ncol(combos), function(j)
+                    tryCatch(expr =
                     fconstr_pGMM(
                         x = z[, combos[, j]],
                         lambda = lambda,
@@ -54,9 +57,10 @@ get_pairwise_fits <-
                         itermax = 200,
                         penaltyType = "SCAD",
                         bound = bound
-                    ))    
+                    ), error = function(e) NA))    
             } else {
                 fits <- lapply(1:ncol(combos), function(j)
+                    tryCatch(expr =
                     fconstr0_pGMM(
                         x = z[, combos[, j]],
                         lambda = lambda,
@@ -64,7 +68,7 @@ get_pairwise_fits <-
                         itermax = 200,
                         penaltyType = "SCAD",
                         bound = bound
-                    ))    
+                    ), error = function(e) NA))    
             }
         }
         names(fits) <-
