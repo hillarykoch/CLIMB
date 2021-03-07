@@ -125,24 +125,24 @@ write_LGF <- function(h, d, path) {
     
     # Write the LGF file
     readr::write_tsv(data.frame("@nodes"),
-                     path = path,
+                     file = path,
                      col_names = FALSE)
     readr::write_tsv(node,
-                     path = path,
+                     file = path,
                      col_names = TRUE,
                      append = TRUE)
     cat("\n", file = path, append = TRUE)
     
     readr::write_tsv(
         data.frame("@arcs"),
-        path = path,
+        file = path,
         col_names = FALSE,
         append = TRUE
     )
     cat("\t\t -\n", file = path, append = TRUE)
     readr::write_tsv(
         arcs,
-        path = path,
+        file = path,
         col_names = FALSE,
         append = TRUE,
         na = ""
@@ -150,14 +150,14 @@ write_LGF <- function(h, d, path) {
     cat("\n", file = path, append = TRUE)
     readr::write_tsv(
         data.frame("@attributes"),
-        path = path,
+        file = path,
         col_names = FALSE,
         append = TRUE
     )
     attrib <- data.frame("type" = c("source", "target"),
                          "label" = c(0, length(unlist(filt_h)) + 1))
     readr::write_tsv(attrib,
-                     path = path,
+                     file = path,
                      col_names = FALSE,
                      append = TRUE)
     cat("done!\n")

@@ -103,7 +103,7 @@ get_hyperparameters <- function(z, fits, reduced_classes, prior_weights) {
     labels <- purrr::map(fits, "post_prob") %>%
         lapply(function(X) apply(X, 1, function(Y) base::sample(1:ncol(X), size = 1, prob = Y)))
 
-    rc <- reduced_classes[prior_weights * n > D, ]
+    rc <- dplyr::filter(reduced_classes, prior_weights * n > D)
 
     hyp <- get_hyperparams(fits, D, rc, z, clusters = labels, var_quantile = 0.75)
     for(i in 1:dim(hyp$Psi0)[3]) {
