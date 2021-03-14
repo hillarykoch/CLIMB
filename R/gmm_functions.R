@@ -76,24 +76,24 @@ fconstr_pGMM <-
         if(any(init$mu > 0.5) & any(init$mu < -0.5)) {
             mu0 <- c(init$mu %>% `[` (init$mu > 0.5),
                      init$mu %>% `[` (init$mu < -0.5) %>% abs) %>%
-                mean %>%
+                mean(na.rm = TRUE) %>%
                 max(c(.5, bound)) %>%
                 `*` (combos)
         } else {
             mu0 <- abs(init$mu) %>%
-                mean %>%
+                mean(na.rm = TRUE) %>%
                 max(bound) %>%
                 `*` (combos)
         }
 
         sigma0 <- apply(init$sigma, 3, diag) %>%
-            mean %>%
+            mean(na.rm = TRUE) %>%
             `*` (combos) %>%
             abs
         sigma0[sigma0 == 0] <- 1
         rho0 <- c(init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] > 0),
                   init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] < 0) %>% abs) %>%
-            mean %>%
+            mean(na.rm = TRUE) %>%
             max(.1) %>%
             min(sigma0 / 2) %>%
             matrix
@@ -222,18 +222,18 @@ fconstr0_pGMM <-
         prop0 <- init$prop
         mu0 <- c(init$mu %>% `[` (init$mu > 1),
                  init$mu %>% `[` (init$mu < -1) %>% abs) %>%
-            mean %>%
+            mean(na.rm = TRUE) %>%
             max(c(0.5, bound)) %>%
             `*` (combos)
         sigma0 <- apply(init$sigma, 3, diag) %>%
             # mean %>%
-            mean %>%
+            mean(na.rm = TRUE) %>%
             `*` (combos) %>%
             abs
         sigma0[sigma0 == 0] <- 1
         rho0 <- c(init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] > 0),
                   init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] < 0) %>% abs) %>%
-            mean %>%
+            mean(na.rm = TRUE) %>%
             max(.1) %>%
             min(sigma0 / 2) %>%
             matrix
