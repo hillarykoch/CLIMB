@@ -7,6 +7,16 @@ GMM_kmeans <- function(x, k, iter.max = 30) {
     d <- ncol(x)
     cl <- kmeans(x, centers = k, iter.max = iter.max)
     mu <- cl$centers
+    
+    if(any(cl$size == 1)) {
+        cl_to_remove <- which(cl$size == 1)
+        cl_to_grow <- sample(seq_along(cl$size)[-cl_to_remove], size = 1)
+        cl$size[cl_to_grow] <- cl$size[cl_to_grow] + length(cl_to_remove)
+        cl$size[cl_to_remove] <- 0
+        
+        cl$cluster[cl$cluster == cl_to_remove] <- cl_to_grow
+    }
+    
     prop <- cl$size / n
 
     if (d == 1) {
