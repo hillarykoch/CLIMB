@@ -110,7 +110,7 @@ fconstr_pGMM <-
 
         if (sum(prop0 == 0) > 0) {
             idx <- prop0 > 0
-            k <- sum(idx)
+            kmax <- sum(idx)
             prop0 <- prop0[idx]
             mu0 <- mu0[idx,]
             sigma0 <- sigma0[idx, ]
@@ -135,7 +135,7 @@ fconstr_pGMM <-
                 sigma = sigma0,
                 rho = rho0,
                 combos = combos,
-                k = k,
+                k = kmax,
                 df = df,
                 lambda = lambda[i],
                 citermax = itermax,
@@ -251,7 +251,7 @@ fconstr0_pGMM <-
         # Eliminate empty clusters
         if (sum(prop0 == 0) > 0) {
             idx <- prop0 > 0
-            k <- sum(idx)
+            kmax <- sum(idx)
             prop0 <- prop0[idx]
             mu0 <- mu0[idx,]
             sigma0 <- sigma0[idx,]
@@ -275,7 +275,7 @@ fconstr0_pGMM <-
                 sigma = sigma0,
                 rho = rho0,
                 combos = combos,
-                k = k,
+                k = kmax,
                 df = df,
                 lambda = lambda[i],
                 citermax = itermax,
