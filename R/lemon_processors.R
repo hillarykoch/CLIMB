@@ -340,8 +340,8 @@ get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = FA
         
         # Write the split LGF files
         if(str_detect(path, "\\.[[:alpha:]]*")) {
-            filepath1 <- str_replace(path, "\\.", "1\\.")
-            filepath2 <- str_replace(path, "\\.", "2\\.")
+            filepath1 <- str_replace(filepath, "\\.", "1\\.")
+            filepath2 <- str_replace(filepath, "\\.", "2\\.")
         } else {
             filepath1 <- paste0(path, "1")
             filepath2 <- paste0(path, "2")
@@ -353,8 +353,12 @@ get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = FA
         assoc1 <- cassociate(paths1, filepath1, length(unlist(filt[1:split_layer])))
         assoc2 <- cassociate(paths2, filepath2, length(unlist(filt[(split_layer):length(filt)])))
         
-        prune1 <- prune_paths(h, assoc1)
-        prune2 <- prune_paths(h, assoc2)
+        rmidx1 <- sapply(as.character(split_layer:d), function(X) stringr::str_detect(names(h), X)) %>%
+            apply(1, any)
+        rmidx2 <- sapply(as.character(seq(split_layer)), function(X) stringr::str_detect(names(h), X)) %>%
+            apply(1, any)
+        prune1 <- prune_paths(h[!rmidx1], assoc1)
+        prune2 <- prune_paths(h[!rmidx2], assoc2)
     }
 }
 
