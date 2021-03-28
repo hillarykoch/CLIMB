@@ -166,20 +166,20 @@ write_LGF <- function(h, d, path) {
 split_LGF <- function(path) {
     cat("Splitting LGF file into 2...")
     lgf_temp <- read_tsv(path, skip = 1)
-    lgf_nodes <- slice(lgf_temp, 1:(which(lgf_temp$label == "@arcs") - 1))
-    lgf_arcs <- slice(lgf_temp, (which(lgf_temp$label == "@arcs") + 2):(which(lgf_temp$label == "@attributes") - 1)) %>%
+    lgf_nodes <- dplyr::slice(lgf_temp, 1:(which(lgf_temp$label == "@arcs") - 1))
+    lgf_arcs <- dplyr::slice(lgf_temp, (which(lgf_temp$label == "@arcs") + 2):(which(lgf_temp$label == "@attributes") - 1)) %>%
         setNames(c("start", "end", "dash")) %>%
         dplyr::select(1:2)
-    lgf_attributes <- slice(lgf_temp, (n()-1):n())
+    lgf_attributes <- dplyr::slice(lgf_temp, (n()-1):n())
     
     # up to this layer will be included in the first run
     split_layer <- ceiling((max(lgf_nodes$dim)-1) / 2)
     
     
     # two node sets
-    lgf_nodes1 <- filter(lgf_nodes, dim <= split_layer) %>%
+    lgf_nodes1 <- dplyr::filter(lgf_nodes, dim <= split_layer) %>%
         bind_rows(tibble(label = as.character(max(as.numeric(.$label)) + 1), dim = split_layer + 1, assoc = "0"))
-    lgf_nodes2 <- filter(lgf_nodes, dim > split_layer) %>%
+    lgf_nodes2 <- dplyr::filter(lgf_nodes, dim > split_layer) %>%
         bind_rows(tibble(
             label = as.character(min(as.numeric(.$label))-1),
             dim = split_layer,
@@ -188,17 +188,17 @@ split_LGF <- function(path) {
         mutate(dim = dim - split_layer)
     
     # two arc sets
-    lgf_arcs1 <- filter(lgf_arcs, end < max(as.numeric(lgf_nodes1$label))) %>%
+    lgf_arcs1 <- dplyr::filter(lgf_arcs, end < max(as.numeric(lgf_nodes1$label))) %>%
         bind_rows(
             tibble(
-                start = filter(lgf_nodes1, dim == split_layer)$label,
+                start = dplyr::filter(lgf_nodes1, dim == split_layer)$label,
                 end = max(as.numeric(lgf_nodes1$label))
             ))
     
     lgf_arcs2 <- bind_rows(
         tibble(start = as.numeric(lgf_nodes2$label)[2] - 1,
-               end = as.numeric(filter(lgf_nodes2, dim == 1)$label)),
-        filter(lgf_arcs, as.numeric(start) >= as.numeric(lgf_nodes2$label)[2]) %>%
+               end = as.numeric(dplyr::filter(lgf_nodes2, dim == 1)$label)),
+        dplyr::filter(lgf_arcs, as.numeric(start) >= as.numeric(lgf_nodes2$label)[2]) %>%
             mutate(across(where(is.character), .fn = as.numeric))
     )
     
@@ -336,7 +336,7 @@ get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = FA
         assoc <- cassociate(paths, filepath, length(unlist(filt)))
         prune_paths(h, assoc) # can probably replace this with C code, cprune_paths
     } else {
-        split_layer <- split_LGF(filepath)
+        split_layer <- suppressWarnings(split_LGF(filepath))
         
         # Write the split LGF files
         if(str_detect(path, "\\.[[:alpha:]]*")) {

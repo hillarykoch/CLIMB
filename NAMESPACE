@@ -1,7 +1,7 @@
 useDynLib(CLIMB, .registration=TRUE)
 importFrom(abind, abind)
 import(doParallel)
-importFrom(dplyr, mutate, bind_cols)
+import(dplyr)
 import(foreach)
 import(JuliaCall)
 importFrom(magrittr, "%>%")
