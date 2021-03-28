@@ -305,7 +305,7 @@ get_paths <- function(filepath) {
 }
 
 # Prune paths that are discordant with "non-consecutive" pairwise estimates
-prune_paths <- function(h, assoc_mx) {
+prune_paths <- function(h, assoc_mx, split_layer = 0) {
     nonconsec <- get_consecutive(h, non_consec = TRUE)
     labs <- names(nonconsec)
     keepers <-
@@ -314,7 +314,8 @@ prune_paths <- function(h, assoc_mx) {
     for (i in seq_along(nonconsec)) {
         pair <- strsplit(labs[i], split = "_") %>%
             `[[` (1) %>%
-            as.numeric
+            as.numeric %>%
+            `-` (split_layer)
         keepers[, i] <-
             crowMatch(assoc_mx[, pair], nonconsec[[i]])[, 1]
     }
@@ -325,8 +326,23 @@ prune_paths <- function(h, assoc_mx) {
     assoc_mx[!prunes, ]
 }
 
+combine_prunes <- function(prune1, prune2, h, split_layer) {
+    join_pair <- h[paste0(split_layer, "_", split_layer + 1)][[1]]
+    
+    map_dfr(1:nrow(join_pair), ~ {
+        l_candidates <- prune1[prune1[,split_layer] == join_pair[.x,1],]
+        r_candidates <- prune2[prune2[,1] == join_pair[.x,2],]
+        suppressMessages(tidyr::expand_grid(
+            as_tibble(l_candidates),
+            as_tibble(r_candidates),
+            .name_repair = "unique"
+        ))
+    }) %>%
+        as.matrix
+} 
+
 # Put everything together in one function here, get_reduced_classes
-get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = FALSE) {
+get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = TRUE) {
     h <- get_h(fits)
     filt <- filter_h(h, d)
     write_LGF(h, d, filepath)
@@ -353,12 +369,18 @@ get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = FA
         assoc1 <- cassociate(paths1, filepath1, length(unlist(filt[1:split_layer])))
         assoc2 <- cassociate(paths2, filepath2, length(unlist(filt[(split_layer):length(filt)])))
         
-        rmidx1 <- sapply(as.character(split_layer:d), function(X) stringr::str_detect(names(h), X)) %>%
+        rmidx1 <- sapply(as.character((split_layer+1):d), function(X) stringr::str_detect(names(h), pattern = paste0("^", X, "_|_", X, "$"))) %>%
             apply(1, any)
-        rmidx2 <- sapply(as.character(seq(split_layer)), function(X) stringr::str_detect(names(h), X)) %>%
+        rmidx2 <- sapply(as.character(seq(split_layer)), function(X) stringr::str_detect(names(h), pattern = paste0("^", X, "_|_", X, "$"))) %>%
             apply(1, any)
-        prune1 <- prune_paths(h[!rmidx1], assoc1)
-        prune2 <- prune_paths(h[!rmidx2], assoc2)
+        prune1 <- prune_paths(h[!rmidx1], assoc1, split_layer = 0)
+        prune2 <- prune_paths(h[!rmidx2], assoc2, split_layer = split_layer)
+        
+        prune_final <- prune_paths(h,
+                                   combine_prunes(prune1, prune2, h, split_layer = split_layer),
+                                   split_layer = 0)
+        colnames(prune_final) <- NULL
+        prune_final
     }
 }
 

@@ -24,7 +24,8 @@ Imports:
     Rcpp (>= 0.12.16),
     stats,
     stringr,
-    testthat
+    testthat,
+    tidyr
 LinkingTo:
     Rcpp,
     RcppArmadillo

@@ -9,6 +9,7 @@ get_reduced_classes(fits, d, filepath = "lgf.txt")
   \item{fits}{Output from \link{get_pairwise_fits}}
   \item{d}{Dimension of data}
   \item{filepath}{Path to write the LEMON graph format fit, to be used internally by CLIMB.}
+  \item{split_into_two}{Logical. Defaults to TRUE. Should the problem be split into 2 sub-problems? This will not change the outcome, but setting to TRUE can save memory and time.}
 }
 \value{
 M by D matrix of candidate latent classes. Each row is one candidate class.
