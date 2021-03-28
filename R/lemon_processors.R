@@ -163,6 +163,139 @@ write_LGF <- function(h, d, path) {
     cat("done!\n")
 }
 
+split_LGF <- function(path) {
+    cat("Splitting LGF file into 2...")
+    lgf_temp <- read_tsv(path, skip = 1)
+    lgf_nodes <- slice(lgf_temp, 1:(which(lgf_temp$label == "@arcs") - 1))
+    lgf_arcs <- slice(lgf_temp, (which(lgf_temp$label == "@arcs") + 2):(which(lgf_temp$label == "@attributes") - 1)) %>%
+        setNames(c("start", "end", "dash")) %>%
+        dplyr::select(1:2)
+    lgf_attributes <- slice(lgf_temp, (n()-1):n())
+    
+    # up to this layer will be included in the first run
+    split_layer <- ceiling((max(lgf_nodes$dim)-1) / 2)
+    
+    
+    # two node sets
+    lgf_nodes1 <- filter(lgf_nodes, dim <= split_layer) %>%
+        bind_rows(tibble(label = as.character(max(as.numeric(.$label)) + 1), dim = split_layer + 1, assoc = "0"))
+    lgf_nodes2 <- filter(lgf_nodes, dim > split_layer) %>%
+        bind_rows(tibble(
+            label = as.character(min(as.numeric(.$label))-1),
+            dim = split_layer,
+            assoc = "0")) %>%
+        arrange(label) %>%
+        mutate(dim = dim - split_layer)
+    
+    # two arc sets
+    lgf_arcs1 <- filter(lgf_arcs, end < max(as.numeric(lgf_nodes1$label))) %>%
+        bind_rows(
+            tibble(
+                start = filter(lgf_nodes1, dim == split_layer)$label,
+                end = max(as.numeric(lgf_nodes1$label))
+            ))
+    
+    lgf_arcs2 <- bind_rows(
+        tibble(start = as.numeric(lgf_nodes2$label)[2] - 1,
+               end = as.numeric(filter(lgf_nodes2, dim == 1)$label)),
+        filter(lgf_arcs, as.numeric(start) >= as.numeric(lgf_nodes2$label)[2]) %>%
+            mutate(across(where(is.character), .fn = as.numeric))
+    )
+    
+    
+    
+    # Write the LGF file
+    if(str_detect(path, "\\.[[:alpha:]]*")) {
+        path1 <- str_replace(path, "\\.", "1\\.")
+        path2 <- str_replace(path, "\\.", "2\\.")
+    } else {
+        path1 <- paste0(path, "1")
+        path2 <- paste0(path, "2")
+    }
+    
+    readr::write_tsv(data.frame("@nodes"),
+                     file = path1,
+                     col_names = FALSE)
+    readr::write_tsv(data.frame("@nodes"),
+                     file = path2,
+                     col_names = FALSE)
+    readr::write_tsv(lgf_nodes1,
+                     file = path1,
+                     col_names = TRUE,
+                     append = TRUE)
+    readr::write_tsv(lgf_nodes2,
+                     file = path2,
+                     col_names = TRUE,
+                     append = TRUE)
+    cat("\n", file = path1, append = TRUE)
+    cat("\n", file = path2, append = TRUE)
+    
+    readr::write_tsv(
+        data.frame("@arcs"),
+        file = path1,
+        col_names = FALSE,
+        append = TRUE
+    )
+    readr::write_tsv(
+        data.frame("@arcs"),
+        file = path2,
+        col_names = FALSE,
+        append = TRUE
+    )
+    
+    cat("\t\t -\n", file = path1, append = TRUE)
+    cat("\t\t -\n", file = path2, append = TRUE)
+    
+    readr::write_tsv(
+        lgf_arcs1,
+        file = path1,
+        col_names = FALSE,
+        append = TRUE,
+        na = ""
+    )
+    readr::write_tsv(
+        lgf_arcs2,
+        file = path2,
+        col_names = FALSE,
+        append = TRUE,
+        na = ""
+    )
+    
+    cat("\n", file = path1, append = TRUE)
+    cat("\n", file = path2, append = TRUE)
+    
+    readr::write_tsv(
+        data.frame("@attributes"),
+        file = path1,
+        col_names = FALSE,
+        append = TRUE
+    )
+    
+    readr::write_tsv(
+        data.frame("@attributes"),
+        file = path2,
+        col_names = FALSE,
+        append = TRUE
+    )
+    
+    attrib1 <- data.frame("type" = c("source", "target"),
+                          "label" = c(0, as.numeric(tail(lgf_nodes1$label, 1))))
+    attrib2 <- data.frame("type" = c("source", "target"),
+                          "label" = c(as.numeric(lgf_nodes2$label[1]), as.numeric(tail(lgf_nodes2$label, 1))))
+    
+    readr::write_tsv(attrib1,
+                     file = path1,
+                     col_names = FALSE,
+                     append = TRUE)
+    readr::write_tsv(attrib2,
+                     file = path2,
+                     col_names = FALSE,
+                     append = TRUE)
+    cat("done!\n")
+    
+    split_layer
+}
+
 # get paths using LEMON, then convert to latent association vectors
 get_paths <- function(filepath) {
     cat("Finding latent classes...")
@@ -172,7 +305,6 @@ get_paths <- function(filepath) {
 }
 
 # Prune paths that are discordant with "non-consecutive" pairwise estimates
-# Can probably borrow old C code for this part
 prune_paths <- function(h, assoc_mx) {
     nonconsec <- get_consecutive(h, non_consec = TRUE)
     labs <- names(nonconsec)
@@ -194,14 +326,36 @@ prune_paths <- function(h, assoc_mx) {
 }
 
 # Put everything together in one function here, get_reduced_classes
-get_reduced_classes <- function(fits, d, filepath = "lgf.txt") {
+get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = FALSE) {
     h <- get_h(fits)
     filt <- filter_h(h, d)
     write_LGF(h, d, filepath)
-    paths <- get_paths(filepath)
-
-    assoc <- cassociate(paths, filepath, length(unlist(filt)))
-    prune_paths(h, assoc) # can probably replace this with C code, cprune_paths
+    
+    if(!split_in_two) {
+        paths <- get_paths(filepath)
+        assoc <- cassociate(paths, filepath, length(unlist(filt)))
+        prune_paths(h, assoc) # can probably replace this with C code, cprune_paths
+    } else {
+        split_layer <- split_LGF(filepath)
+        
+        # Write the split LGF files
+        if(str_detect(path, "\\.[[:alpha:]]*")) {
+            filepath1 <- str_replace(path, "\\.", "1\\.")
+            filepath2 <- str_replace(path, "\\.", "2\\.")
+        } else {
+            filepath1 <- paste0(path, "1")
+            filepath2 <- paste0(path, "2")
+        }
+        
+        paths1 <- get_paths(filepath1)
+        paths2 <- get_paths(filepath2)
+        
+        assoc1 <- cassociate(paths1, filepath1, length(unlist(filt[1:split_layer])))
+        assoc2 <- cassociate(paths2, filepath2, length(unlist(filt[(split_layer):length(filt)])))
+        
+        prune1 <- prune_paths(h, assoc1)
+        prune2 <- prune_paths(h, assoc2)
+    }
 }
 
 # Among all reduced classes, get the indices which correspond to the truth
