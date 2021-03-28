@@ -339,12 +339,12 @@ get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = FA
         split_layer <- suppressWarnings(split_LGF(filepath))
         
         # Write the split LGF files
-        if(str_detect(path, "\\.[[:alpha:]]*")) {
+        if(str_detect(filepath, "\\.[[:alpha:]]*")) {
             filepath1 <- str_replace(filepath, "\\.", "1\\.")
             filepath2 <- str_replace(filepath, "\\.", "2\\.")
         } else {
-            filepath1 <- paste0(path, "1")
-            filepath2 <- paste0(path, "2")
+            filepath1 <- paste0(filepath, "1")
+            filepath2 <- paste0(filepath, "2")
         }
         
         paths1 <- get_paths(filepath1)
