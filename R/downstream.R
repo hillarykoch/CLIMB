@@ -144,7 +144,7 @@ compute_distances_between_clusters <- function(chain, burnin) {
 }
 
 # Get row reordering (for bi-clustering heatmaps)
-get_row_reordering <- function(row_clustering, chain, burnin) {
+get_row_reordering <- function(row_clustering, chain, burnin, dat) {
   # Get MAP class labels based on posterior samples
   z <- get_MAP_z(chain, burnin)
 
