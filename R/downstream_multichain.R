@@ -1,69 +1,93 @@
-# merge_classes_multichain <- function(n_groups, chain, burnin) {
-#     mu <- map(chain$mu_chains, ~ colMeans(.x[-burnin, ])) %>%
-#         bind_cols() %>%
-#         as.matrix %>%
-#         unname
-#     prop <- colMeans(chain$prop_chain[-burnin, ])
-#     sig_ests <-
-#         map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>% simplify2array
-#     z <- get_MAP_z(chain, burnin)
-#     nm <- ncol(mu)
-#     dm <- nrow(mu)
-# 
-# 
-#     cluster_dist <- matrix(0, nm, nm)
-#     combos <- combn(unique(z), 2)
-#     for (i in 1:ncol(combos)) {
-#         cluster_dist[combos[1, i], combos[2, i]] <-
-#             cluster_dist[combos[2, i], combos[1, i]] <-
-#             get_KL_distance(
-#                 mu1 = mu[, combos[1, i]],
-#                 mu2 =  mu[, combos[2, i]],
-#                 Sigma1 = sig_ests[, , combos[1, i]],
-#                 Sigma2 = sig_ests[, , combos[2, i]]
-#             )
-#     }
-#     rownames(cluster_dist) <- colnames(cluster_dist) <- 1:nm
-#     rmidx <- rowSums(cluster_dist) == 0
-# 
-#     if(sum(!rmidx) < n_groups) {
-#       n_groups <- sum(!rmidx)
-#       warning(paste0("n_groups should be less than or equal to the number of non-empty clusters.\nYou have ",
-#                   sum(!rmidx), " empty clusters, so merging with that number instead."))
-#     }
-# 
-#     cluster_dist <- cluster_dist[!rmidx,!rmidx]
-#     cl <- hclust(as.dist(cluster_dist), method = "complete")
-# 
-#     merge_idx <- cutree(cl, k = n_groups)
-#     merge_prop <- rep(0, length(unique(merge_idx)))
-#     merge_mu <- matrix(NA, length(unique(merge_idx)), dm)
-#     for (i in sort(unique(merge_idx))) {
-#         subidx <- as.numeric(names(merge_idx[merge_idx == i]))
-#         sub_prop <- prop[subidx]
-#         sub_mu <- mu[, subidx]
-#         merge_prop[i] <- sum(sub_prop)
-# 
-#         if (length(sub_prop) == 1) {
-#             merge_mu[i, ] <- sub_mu
-#         } else {
-#             merge_mu[i, ] <- sub_mu %*% (sub_prop / merge_prop[i])
-#         }
-#     }
-#     merge_prop <- merge_prop / sum(merge_prop)
-# 
-#     outz <- z
-#     for (i in sort(unique(merge_idx))) {
-#         outz[z %in% as.numeric(names(merge_idx[merge_idx == i]))] <- i
-#     }
-# 
-#     list(
-#         "merged_z" = outz,
-#         "merged_mu" = merge_mu,
-#         "merged_prop" = merge_prop,
-#         "clustering" = cl
-#     )
-# }
+merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
+    if(typeof(burnin_list) != "list") {
+        burnin_list <- map(1:length(chain_list), ~burnin_list)
+    }
+    newclustlabs <- cumsum(map_int(chain_list, ~ ncol(.x$prop_chain)))
+    
+    mu <- map2(chain_list, burnin_list, ~
+                   map_dfc(.x$mu_chains, ~ colMeans(.x[-.y, ]), .y = .y) %>%
+                   as.matrix %>%
+                   unname) %>%
+        do.call(what = cbind, args = .)
+    prop <- map2(chain_list, burnin_list, ~ colMeans(.x$prop_chain[-.y, ])) %>%
+        unlist %>%
+        unname
+    sig_ests <-
+        map2(chain_list, burnin_list, ~
+                 lapply(.x$Sigma_chains, function(X)
+                     apply(X[, , -.y], c(1, 2), mean)) %>%
+                 simplify2array) %>%
+        abind::abind(along = 3)
+    
+    z_chain <- map2(chain_list, burnin_list, ~ .x$z_chain[, -.y])
+    for(i in 2:length(newclustlabs)) {
+        zold <- 1
+        for(z in (newclustlabs[i-1]+1):newclustlabs[i]) {
+            z_chain[[i]][z_chain[[i]] == zold] <- z
+            zold <- zold + 1
+        }
+    }
+    rles <- map(z_chain, ~ apply(.x, 1, function(X) rle(sort(X))))
+    z <- map(rles, ~ map_int(.x, ~ .x$values[which.max(.x$lengths)])) %>%
+        unlist
+    
+    nm <- ncol(mu)
+    dm <- nrow(mu)
+    
+    cluster_dist <- matrix(0, nm, nm)
+    combos <- combn(unique(z), 2)
+    for (i in 1:ncol(combos)) {
+        cluster_dist[combos[1, i], combos[2, i]] <-
+            cluster_dist[combos[2, i], combos[1, i]] <-
+            get_KL_distance(
+                mu1 = mu[, combos[1, i]],
+                mu2 =  mu[, combos[2, i]],
+                Sigma1 = sig_ests[, , combos[1, i]],
+                Sigma2 = sig_ests[, , combos[2, i]]
+            )
+    }
+    rownames(cluster_dist) <- colnames(cluster_dist) <- 1:nm
+
+    rmidx <- rowSums(cluster_dist) == 0
+
+    if(sum(!rmidx) < n_groups) {
+      n_groups <- sum(!rmidx)
+      warning(paste0("n_groups should be less than or equal to the number of non-empty clusters.\nYou have ",
+                  sum(!rmidx), " empty clusters, so merging with that number instead."))
+    }
+
+    cluster_dist <- cluster_dist[!rmidx,!rmidx]
+    cl <- hclust(as.dist(cluster_dist), method = "complete")
+
+    merge_idx <- cutree(cl, k = n_groups)
+    merge_prop <- rep(0, length(unique(merge_idx)))
+    merge_mu <- matrix(NA, length(unique(merge_idx)), dm)
+    for (i in sort(unique(merge_idx))) {
+        subidx <- as.numeric(names(merge_idx[merge_idx == i]))
+        sub_prop <- prop[subidx]
+        sub_mu <- mu[, subidx]
+        merge_prop[i] <- sum(sub_prop)
+
+        if (length(sub_prop) == 1) {
+            merge_mu[i, ] <- sub_mu
+        } else {
+            merge_mu[i, ] <- sub_mu %*% (sub_prop / merge_prop[i])
+        }
+    }
+    merge_prop <- merge_prop / sum(merge_prop)
+
+    outz <- z
+    for (i in sort(unique(merge_idx))) {
+        outz[z %in% as.numeric(names(merge_idx[merge_idx == i]))] <- i
+    }
+
+    list(
+        "merged_z" = outz,
+        "merged_mu" = merge_mu,
+        "merged_prop" = merge_prop,
+        "clustering" = cl
+    )
+}
 
 
 # Clustering the columns
@@ -92,7 +116,7 @@ compute_distances_between_conditions_multichain <- function(chain_list, burnin_l
         Reduce(`+`, x = .)
     
     # Convert to distance
-    sqrt(1-(weighted_corrs) ^ 2)
+    return(sqrt(1-(weighted_corrs) ^ 2))
 }
 
 
@@ -157,7 +181,7 @@ compute_distances_between_clusters_multichain <- function(chain_list, burnin_lis
     
     rownames(cluster_dist) <- colnames(cluster_dist) <- labels
     
-    cluster_dist
+    return(cluster_dist)
 }
 
 # Get row reordering (for bi-clustering heatmaps)
