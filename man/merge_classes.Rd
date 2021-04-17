@@ -11,8 +11,11 @@ merge_classes(n_groups, chain, burnin)
 }
 \arguments{
   \item{n_groups}{Integer. How many parent groups to merge the classes into?}
-  \item{chain}{An object output from \link[CLIMB]{extract_chains} function.}
+  \item{chain}{An object output from the \link[CLIMB]{extract_chains} function.}
   \item{burnin}{Iterations to be used as burn-in.}
+  \item{multichain}{Logical. Defaults to FALSE. Set to true if analyzing multiple
+  different MCMC outputs together. `chain` should be a list of objects output
+  from the \link[CLIMB]{extract_chains} function.}
 }
 \value{
     \item{merged_z}{New group labels assigned to each observation}

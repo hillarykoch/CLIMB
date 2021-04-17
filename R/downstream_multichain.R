@@ -3,7 +3,7 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
         burnin_list <- map(1:length(chain_list), ~burnin_list)
     }
     newclustlabs <- cumsum(map_int(chain_list, ~ ncol(.x$prop_chain)))
-    
+
     mu <- map2(chain_list, burnin_list, ~
                    map_dfc(.x$mu_chains, ~ colMeans(.x[-.y, ]), .y = .y) %>%
                    as.matrix %>%
@@ -18,7 +18,7 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
                      apply(X[, , -.y], c(1, 2), mean)) %>%
                  simplify2array) %>%
         abind::abind(along = 3)
-    
+
     z_chain <- map2(chain_list, burnin_list, ~ .x$z_chain[, -.y])
     for(i in 2:length(newclustlabs)) {
         zold <- 1
@@ -30,10 +30,10 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     rles <- map(z_chain, ~ apply(.x, 1, function(X) rle(sort(X))))
     z <- map(rles, ~ map_int(.x, ~ .x$values[which.max(.x$lengths)])) %>%
         unlist
-    
+
     nm <- ncol(mu)
     dm <- nrow(mu)
-    
+
     cluster_dist <- matrix(0, nm, nm)
     combos <- combn(unique(z), 2)
     for (i in 1:ncol(combos)) {
@@ -95,14 +95,14 @@ compute_distances_between_conditions_multichain <- function(chain_list, burnin_l
     if(typeof(burnin_list) != "list") {
         burnin_list <- map(1:length(chain_list), ~burnin_list)
     }
-    
+
     n_vec <- map_int(chain_list, ~ nrow(.x$z_chain))
     sample_prop_vec <- n_vec / sum(n_vec)
-    
+
     weighted_corrs <- purrr::pmap(.l = list(chain_list, burnin_list, sample_prop_vec), ~ {
         # Get parameter estimates after burn-in
         prop <- colMeans(..1$prop_chain[-(..2), ]) * ..3
-        
+
         sig_ests <- map(..1$Sigma_chains, function(xx) apply(xx[, , -(..2)], c(1, 2), mean)) %>%
             simplify2array
 
@@ -114,7 +114,7 @@ compute_distances_between_conditions_multichain <- function(chain_list, burnin_l
             Reduce(`+`, x = .)
     }) %>%
         Reduce(`+`, x = .)
-    
+
     # Convert to distance
     return(sqrt(1-(weighted_corrs) ^ 2))
 }
@@ -125,9 +125,9 @@ compute_distances_between_clusters_multichain <- function(chain_list, burnin_lis
     if(typeof(burnin_list) != "list") {
         burnin_list <- map(1:length(chain_list), ~ burnin_list)
     }
-    
+
     newclustlabs <- cumsum(map_int(chain_list, ~ ncol(.x$prop_chain)))
-    
+
     # Get parameter estimates after burn-in
     mu <- map2(chain_list, burnin_list, ~
                    map_dfc(.x$mu_chains, ~ colMeans(.x[-.y, ]), .y = .y) %>%
@@ -138,7 +138,7 @@ compute_distances_between_clusters_multichain <- function(chain_list, burnin_lis
         unlist %>%
         unname
     z_chain <- map2(chain_list, burnin_list, ~ .x$z_chain[, -.y])
-    
+
     for(i in 2:length(newclustlabs)) {
         zold <- 1
         for(z in (newclustlabs[i-1]+1):newclustlabs[i]) {
@@ -149,18 +149,18 @@ compute_distances_between_clusters_multichain <- function(chain_list, burnin_lis
     rles <- map(z_chain, ~ apply(.x, 1, function(X) rle(sort(X))))
     z <- map(rles, ~ map_int(.x, ~ .x$values[which.max(.x$lengths)])) %>%
         unlist
-    
+
     sig_ests <-
         map2(chain_list, burnin_list, ~
                  lapply(.x$Sigma_chains, function(X)
                      apply(X[, , -.y], c(1, 2), mean)) %>%
                  simplify2array) %>%
         abind::abind(along = 3)
-    
+
     nm <- ncol(mu)
     dm <- nrow(mu)
-    
-    
+
+
     cluster_dist <- matrix(0, nm, nm)
     combos <- combn(unique(z), 2)
     for (i in 1:ncol(combos)) {
@@ -175,12 +175,12 @@ compute_distances_between_clusters_multichain <- function(chain_list, burnin_lis
     }
     rmidx <- rowSums(cluster_dist) == 0
     cluster_dist <- cluster_dist[!rmidx, !rmidx]
-    
+
     labels <- apply(sign(mu[,!rmidx]), 2, function(X)
         paste0("(", paste0(X, collapse = ","), ")"))
-    
+
     rownames(cluster_dist) <- colnames(cluster_dist) <- labels
-    
+
     return(cluster_dist)
 }
 
@@ -189,7 +189,7 @@ get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_lis
    if(typeof(burnin_list) != "list") {
        burnin_list <- map(1:length(chain_list), ~burnin_list)
    }
-    
+
   dat <- as.matrix(dplyr::bind_rows(dat_list))
 
   # Get MAP class labels based on posterior samples
@@ -207,8 +207,8 @@ get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_lis
           zold <- zold + 1
       }
   }
-  
-  
+
+
 
   # cluster number
   nm <- length(row_clustering$order)
@@ -216,13 +216,13 @@ get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_lis
   # Get a row label based on row clustering
   z <- unlist(z_list)
   rm(z_list)
-  
+
   count <- 1
   for(znew in sort(unique(z))) {
       z[z == znew] <- count
       count <- count + 1
   }
-  
+
   newz <- z
   count <- 1
   for (i in seq(nm)) {
@@ -243,7 +243,7 @@ get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_lis
   newz
 }
 
- 
+
 # test_consistency_multichain <- function(chain,
 #                              burnin,
 #                              u = NULL,
@@ -255,57 +255,57 @@ get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_lis
 #     do.call(`rbind`, .)
 #   n <- nrow(z_chain)
 #   D <- ncol(labs)
-# 
+#
 #   if(with_zero & !is.null(u)) {
 #     warning("Testing consistency and including the null class, but a threshold u was specified. Ignoring u and setting u = D.")
 #   }
-# 
+#
 #   if(!is.null(u)) {
 #     if(u > D) {
 #       stop("u cannot be greater than the dimension of the data.")
 #     }
 #   }
-# 
-# 
+#
+#
 #   if(agnostic_to_sign) {
 #     labs <- abs(labs)
 #   }
-# 
+#
 #   # Testing for consistency across all dimensions
 #   if(with_zero) {
 #     u <- D
-# 
+#
 #     # Find labels where all entries are equal
 #     consistent_lab_idx <- apply(labs, 1, function(X) diff(range(X)) == 0)
-# 
+#
 #     # If there are no consistent labels, there are no consistent observations
 #     if(sum(consistent_lab_idx) == 0) {
 #       return(rep(FALSE, n))
 #     }
-# 
+#
 #     consistent_lab_idx <- which(consistent_lab_idx)
 #   } else { # Testing for replicability of a signal
-# 
+#
 #     consistent_pos_lab_idx <- apply(labs, 1, function(X) sum(X == 1) >= u)
 #     consistent_neg_lab_idx <- apply(labs, 1, function(X) sum(X == -1) >= u)
-# 
+#
 #     # If there are no consistent labels, there are no consistent observations
 #     if(sum(consistent_pos_lab_idx) == 0 & sum(consistent_neg_lab_idx) == 0) {
 #       return(rep(FALSE, n))
 #     }
-# 
+#
 #     consistent_lab_idx <-
 #       sort(unique(c(
 #         which(consistent_neg_lab_idx),
 #         which(consistent_pos_lab_idx)
 #       )))
 #   }
-# 
+#
 #   # Find probabilities that each observation is assigned a consistent label
 #   consistent_prob <-
 #     colMeans(apply(z_chain, 1, function(X)
 #       X %in% consistent_lab_idx))
-# 
+#
 #   if(length(b) == 1) {
 #     return(consistent_prob > b)
 #   } else {
