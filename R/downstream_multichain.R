@@ -53,7 +53,7 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     if(sum(!rmidx) < n_groups) {
       n_groups <- sum(!rmidx)
       warning(paste0("n_groups should be less than or equal to the number of non-empty clusters.\nYou have ",
-                  sum(!rmidx), " empty clusters, so merging with that number instead."))
+                  sum(!rmidx), " non-empty clusters, so merging with that number instead."))
     }
 
     cluster_dist <- cluster_dist[!rmidx,!rmidx]
@@ -62,16 +62,30 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     merge_idx <- cutree(cl, k = n_groups)
     merge_prop <- rep(0, length(unique(merge_idx)))
     merge_mu <- matrix(NA, length(unique(merge_idx)), dm)
+    
+    merge_sigma <- array(NA, dim = c(dm, dm, length(unique(merge_idx))))
+    
+    
     for (i in sort(unique(merge_idx))) {
         subidx <- as.numeric(names(merge_idx[merge_idx == i]))
         sub_prop <- prop[subidx]
         sub_mu <- mu[, subidx]
+        
+        sub_sigma <- sig_ests[,,subidx]
+        
         merge_prop[i] <- sum(sub_prop)
 
         if (length(sub_prop) == 1) {
             merge_mu[i, ] <- sub_mu
+            
+            merge_sigma[,,i] <- sub_sigma
         } else {
             merge_mu[i, ] <- sub_mu %*% (sub_prop / merge_prop[i])
+            
+            for(j in seq_along(sub_prop)) {
+                sub_sigma[,,j] <- sub_sigma[,,j] * (sub_prop[j] / merge_prop[i])
+            }
+            merge_sigma[,,i] <- apply(sub_sigma, c(1,2), sum)
         }
     }
     merge_prop <- merge_prop / sum(merge_prop)
@@ -84,6 +98,7 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     list(
         "merged_z" = outz,
         "merged_mu" = merge_mu,
+        "merged_sigma" = merge_sigma,
         "merged_prop" = merge_prop,
         "clustering" = cl
     )
@@ -202,8 +217,6 @@ get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_lis
       zold <- 1
       for(z in (newclustlabs[i-1]+1):newclustlabs[i]) {
           z_list[[i]][z_list[[i]] == zold] <- z
-          # zold_count <- zold_count + 1
-          # zold <- sort(row_clustering$order)[zold_count]
           zold <- zold + 1
       }
   }
