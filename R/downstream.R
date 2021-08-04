@@ -1,7 +1,13 @@
 # Get most likely class label based on posterior samples
-get_MAP_z <- function(chain, burnin) {
+get_MAP_z <- function(chain, burnin, thresh) {
   rles <- apply(chain$z_chain[,-burnin], 1, function(X) rle(sort(X)))
-  z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+  
+  if(missing(thresh)) {
+      z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])    
+  } else {
+      z <- map_int(rles, ~ .x$values[.x$lengths / sum(.x$lengths) >= thresh])
+  }
+  z
 }
 
 # Computes pairwise KL distance between 2 MVNs
@@ -24,7 +30,7 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
         prop <- colMeans(chain$prop_chain[-burnin, ])
         sig_ests <-
             map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>% simplify2array
-        z <- get_MAP_z(chain, burnin)
+        z <- get_MAP_z(chain, burnin, 0.5)
         nm <- ncol(mu)
         dm <- nrow(mu)
 
@@ -143,7 +149,8 @@ compute_distances_between_clusters <- function(chain, burnin, multichain = FALSE
         dm <- nrow(mu)
 
         rles <- apply(z_chain, 1, function(X) rle(sort(X)))
-        z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+        # z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+        z <- unlist(map(rles, ~ .x$values[.x$lengths / sum(.x$lengths) >= 0.5]))
 
 
         cluster_dist <- matrix(0, nm, nm)

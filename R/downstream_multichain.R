@@ -28,7 +28,9 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
         }
     }
     rles <- map(z_chain, ~ apply(.x, 1, function(X) rle(sort(X))))
-    z <- map(rles, ~ map_int(.x, ~ .x$values[which.max(.x$lengths)])) %>%
+    # z <- map(rles, ~ map_int(.x, ~ .x$values[which.max(.x$lengths)])) %>%
+    #     unlist
+    z <- map(rles, ~ unlist(map(.x, ~ .x$values[.x$lengths / sum(.x$lengths) >= 0.5]))) %>%
         unlist
 
     nm <- ncol(mu)
@@ -91,8 +93,33 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     merge_prop <- merge_prop / sum(merge_prop)
 
     outz <- z
+    out_rles <- rles
     for (i in sort(unique(merge_idx))) {
-        outz[z %in% as.numeric(names(merge_idx[merge_idx == i]))] <- i
+        grp <- as.numeric(names(merge_idx[merge_idx == i]))
+        outz[z %in% grp] <- i
+        
+        for(g in names(rles)) {
+            for(r in seq_along(rles[[g]])) {
+                out_rles[[g]][[r]]$values[rles[[g]][[r]]$values %in% grp] <- i
+            }
+        }
+    }
+    
+    for (i in sort(unique(merge_idx))) {
+        for(g in names(rles)) {
+            for(r in seq_along(rles[[g]])) {
+                
+                reduce_idx <- out_rles[[g]][[r]]$values == i
+                
+                if(sum(reduce_idx) > 1) {
+                    out_rles[[g]][[r]]$lengths[reduce_idx] <-
+                        sum(out_rles[[g]][[r]]$lengths[reduce_idx])
+                    out_rles[[g]][[r]]$lengths <- out_rles[[g]][[r]]$lengths[-tail(which(reduce_idx), -1)]
+                    out_rles[[g]][[r]]$values <- out_rles[[g]][[r]]$values[-tail(which(reduce_idx), -1)]    
+                }
+                
+            }
+        }
     }
 
     list(
@@ -100,7 +127,8 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
         "merged_mu" = merge_mu,
         "merged_sigma" = merge_sigma,
         "merged_prop" = merge_prop,
-        "clustering" = cl
+        "clustering" = cl,
+        "merged_rles" = out_rles
     )
 }
 
