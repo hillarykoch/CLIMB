@@ -1,13 +1,8 @@
 # Get most likely class label based on posterior samples
-get_MAP_z <- function(chain, burnin, thresh) {
+get_MAP_z <- function(chain, burnin) {
   rles <- apply(chain$z_chain[,-burnin], 1, function(X) rle(sort(X)))
   
-  if(missing(thresh)) {
-      z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])    
-  } else {
-      z <- map_int(rles, ~ .x$values[.x$lengths / sum(.x$lengths) >= thresh])
-  }
-  z
+  map_int(rles, ~ .x$values[which.max(.x$lengths)])    
 }
 
 # Computes pairwise KL distance between 2 MVNs
@@ -19,7 +14,7 @@ get_KL_distance <- function(mu1, mu2, Sigma1, Sigma2) {
     0.5 * (KL1 + KL2)
 }
 
-merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, thresh) {
+merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
     if(multichain) {
         merge_classes_multichain(n_groups, chain, burnin)
     } else {
@@ -30,12 +25,9 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, thresh) {
         prop <- colMeans(chain$prop_chain[-burnin, ])
         sig_ests <-
             map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>% simplify2array
-        if(missing(thresh)) {
-            z <- get_MAP_z(chain, burnin)    
-        } else {
-            z <- get_MAP_z(chain, burnin, thresh)
-        }
-        
+
+        z <- get_MAP_z(chain, burnin)    
+
         nm <- ncol(mu)
         dm <- nrow(mu)
 
@@ -183,18 +175,13 @@ compute_distances_between_clusters <- function(chain, burnin, multichain = FALSE
 }
 
 # Get row reordering (for bi-clustering heatmaps)
-get_row_reordering <- function(row_clustering, chain, burnin, dat, multichain = FALSE, thresh) {
+get_row_reordering <- function(row_clustering, chain, burnin, dat, multichain = FALSE) {
     if(multichain) {
         get_row_reordering_multichain(row_clustering, chain, burnin, dat)
     } else {
-        
-        if(missing(thresh)) {
-            z <- get_MAP_z(chain, burnin)
-        } else {
-            # Get MAP class labels based on posterior samples
-            z <- get_MAP_z(chain, burnin, thresh)
-        }
-
+        # Get MAP class labels based on posterior samples
+        z <- get_MAP_z(chain, burnin)
+    
         # cluster number
         nm <- length(row_clustering$order)
 
