@@ -28,8 +28,7 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
         }
     }
     rles <- map(z_chain, ~ apply(.x, 1, function(X) rle(sort(X))))
-    # z <- map(rles, ~ map_int(.x, ~ .x$values[which.max(.x$lengths)])) %>%
-    #     unlist
+    
     z <- map(rles, ~ unlist(map(.x, ~ .x$values[.x$lengths / sum(.x$lengths) >= 0.5]))) %>%
         unlist
 
@@ -228,16 +227,21 @@ compute_distances_between_clusters_multichain <- function(chain_list, burnin_lis
 }
 
 # Get row reordering (for bi-clustering heatmaps)
-get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_list, dat_list) {
+get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_list, dat_list, thresh) {
    if(typeof(burnin_list) != "list") {
        burnin_list <- map(1:length(chain_list), ~burnin_list)
    }
 
   dat <- as.matrix(dplyr::bind_rows(dat_list))
 
-  # Get MAP class labels based on posterior samples
-  # rename cluster labels after aggregatng
-  z_list <- map2(chain_list, burnin_list, ~ get_MAP_z(.x, .y))
+  if(missing(thresh)) {
+      # Get MAP class labels based on posterior samples
+      # rename cluster labels after aggregatng
+      z_list <- map2(chain_list, burnin_list, ~ get_MAP_z(.x, .y))    
+  } else {
+      z_list <- map2(chain_list, burnin_list, ~ get_MAP_z(.x, .y, thresh))
+  }
+  
   newclustlabs <- cumsum(map_int(chain_list, ~ ncol(.x$prop_chain)))
   for(i in 2:length(newclustlabs)) {
       # zold_count <- 1

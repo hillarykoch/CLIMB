@@ -19,7 +19,7 @@ get_KL_distance <- function(mu1, mu2, Sigma1, Sigma2) {
     0.5 * (KL1 + KL2)
 }
 
-merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
+merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, thresh) {
     if(multichain) {
         merge_classes_multichain(n_groups, chain, burnin)
     } else {
@@ -30,7 +30,12 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
         prop <- colMeans(chain$prop_chain[-burnin, ])
         sig_ests <-
             map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>% simplify2array
-        z <- get_MAP_z(chain, burnin, 0.5)
+        if(missing(thresh)) {
+            z <- get_MAP_z(chain, burnin)    
+        } else {
+            z <- get_MAP_z(chain, burnin, thresh)
+        }
+        
         nm <- ncol(mu)
         dm <- nrow(mu)
 
@@ -178,12 +183,17 @@ compute_distances_between_clusters <- function(chain, burnin, multichain = FALSE
 }
 
 # Get row reordering (for bi-clustering heatmaps)
-get_row_reordering <- function(row_clustering, chain, burnin, dat, multichain = FALSE) {
+get_row_reordering <- function(row_clustering, chain, burnin, dat, multichain = FALSE, thresh) {
     if(multichain) {
         get_row_reordering_multichain(row_clustering, chain, burnin, dat)
     } else {
-        # Get MAP class labels based on posterior samples
-        z <- get_MAP_z(chain, burnin)
+        
+        if(missing(thresh)) {
+            z <- get_MAP_z(chain, burnin)
+        } else {
+            # Get MAP class labels based on posterior samples
+            z <- get_MAP_z(chain, burnin, thresh)
+        }
 
         # cluster number
         nm <- length(row_clustering$order)
