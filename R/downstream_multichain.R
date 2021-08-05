@@ -120,6 +120,18 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
             }
         }
     }
+    
+    # clean up leftovers that were never MAP
+    for(g in names(rles)) {
+        for(r in seq_along(rles[[g]])) {
+            rmidx <- !(out_rles[[g]][[r]]$values %in% sort(unique(merge_idx)))
+            
+            if(any(rmidx)) {
+                out_rles[[g]][[r]]$lengths <- out_rles[[g]][[r]]$lengths[!rmidx]
+                out_rles[[g]][[r]]$values <- out_rles[[g]][[r]]$values[!rmidx]
+            }
+        }
+    }
 
     list(
         "merged_z" = outz,
