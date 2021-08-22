@@ -16,6 +16,8 @@ merge_classes(n_groups, chain, burnin)
   \item{multichain}{Logical. Defaults to FALSE. Set to true if analyzing multiple
   different MCMC outputs together. `chain` should be a list of objects output
   from the \link[CLIMB]{extract_chains} function.}
+  \item{method}{Agglomeration method to be used. See \link[stats]{hclust}.}
+  \item{...}{Other arguments to be passed to \link[stats]{hclust}.}
 }
 \value{
     \item{merged_z}{New group labels assigned to each observation}

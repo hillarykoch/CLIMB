@@ -14,9 +14,9 @@ get_KL_distance <- function(mu1, mu2, Sigma1, Sigma2) {
     0.5 * (KL1 + KL2)
 }
 
-merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, method = "average") {
+merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, method = "average", ...) {
     if(multichain) {
-        merge_classes_multichain(n_groups, chain, burnin, method = method)
+        merge_classes_multichain(n_groups, chain, burnin, method = method, ...)
     } else {
         mu <- map(chain$mu_chains, ~ colMeans(.x[-burnin, ])) %>%
             bind_cols() %>%
@@ -54,7 +54,7 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, method = 
         }
 
         cluster_dist <- cluster_dist[!rmidx,!rmidx]
-        cl <- hclust(as.dist(cluster_dist), method = method)
+        cl <- hclust(as.dist(cluster_dist), method = method, ...)
 
         merge_idx <- cutree(cl, k = n_groups)
         merge_prop <- rep(0, length(unique(merge_idx)))
@@ -96,7 +96,8 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, method = 
             "merged_mu" = merge_mu,
             "merged_sigma" = merge_sigma,
             "merged_prop" = merge_prop,
-            "clustering" = cl
+            "clustering" = cl,
+            "distmat" = cluster_dist
         )
     }
 }
