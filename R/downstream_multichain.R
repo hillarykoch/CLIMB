@@ -1,4 +1,4 @@
-merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
+merge_classes_multichain <- function(n_groups, chain_list, burnin_list, method = "average") {
     if(typeof(burnin_list) != "list") {
         burnin_list <- map(1:length(chain_list), ~burnin_list)
     }
@@ -58,7 +58,7 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     }
 
     cluster_dist <- cluster_dist[!rmidx,!rmidx]
-    cl <- hclust(as.dist(cluster_dist), method = "complete")
+    cl <- hclust(as.dist(cluster_dist), method = method)
 
     merge_idx <- cutree(cl, k = n_groups)
     merge_prop <- rep(0, length(unique(merge_idx)))
