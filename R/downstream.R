@@ -1,7 +1,8 @@
 # Get most likely class label based on posterior samples
 get_MAP_z <- function(chain, burnin) {
   rles <- apply(chain$z_chain[,-burnin], 1, function(X) rle(sort(X)))
-  z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+  
+  map_int(rles, ~ .x$values[which.max(.x$lengths)])    
 }
 
 # Computes pairwise KL distance between 2 MVNs
@@ -13,9 +14,9 @@ get_KL_distance <- function(mu1, mu2, Sigma1, Sigma2) {
     0.5 * (KL1 + KL2)
 }
 
-merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
+merge_classes <- function(n_groups, chain, burnin, multichain = FALSE, method = "average", ...) {
     if(multichain) {
-        merge_classes_multichain(n_groups, chain, burnin)
+        merge_classes_multichain(n_groups, chain, burnin, method = method, ...)
     } else {
         mu <- map(chain$mu_chains, ~ colMeans(.x[-burnin, ])) %>%
             bind_cols() %>%
@@ -24,7 +25,9 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
         prop <- colMeans(chain$prop_chain[-burnin, ])
         sig_ests <-
             map(chain$Sigma_chains, ~ apply(.x[, , -burnin], c(1, 2), mean)) %>% simplify2array
-        z <- get_MAP_z(chain, burnin)
+
+        z <- get_MAP_z(chain, burnin)    
+
         nm <- ncol(mu)
         dm <- nrow(mu)
 
@@ -51,7 +54,7 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
         }
 
         cluster_dist <- cluster_dist[!rmidx,!rmidx]
-        cl <- hclust(as.dist(cluster_dist), method = "complete")
+        cl <- hclust(as.dist(cluster_dist), method = method, ...)
 
         merge_idx <- cutree(cl, k = n_groups)
         merge_prop <- rep(0, length(unique(merge_idx)))
@@ -93,7 +96,8 @@ merge_classes <- function(n_groups, chain, burnin, multichain = FALSE) {
             "merged_mu" = merge_mu,
             "merged_sigma" = merge_sigma,
             "merged_prop" = merge_prop,
-            "clustering" = cl
+            "clustering" = cl,
+            "distmat" = cluster_dist
         )
     }
 }
@@ -143,7 +147,8 @@ compute_distances_between_clusters <- function(chain, burnin, multichain = FALSE
         dm <- nrow(mu)
 
         rles <- apply(z_chain, 1, function(X) rle(sort(X)))
-        z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+        # z <- map_int(rles, ~ .x$values[which.max(.x$lengths)])
+        z <- unlist(map(rles, ~ .x$values[.x$lengths / sum(.x$lengths) >= 0.5]))
 
 
         cluster_dist <- matrix(0, nm, nm)
@@ -177,7 +182,7 @@ get_row_reordering <- function(row_clustering, chain, burnin, dat, multichain = 
     } else {
         # Get MAP class labels based on posterior samples
         z <- get_MAP_z(chain, burnin)
-
+    
         # cluster number
         nm <- length(row_clustering$order)
 

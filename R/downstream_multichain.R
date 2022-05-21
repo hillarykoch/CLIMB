@@ -1,4 +1,4 @@
-merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
+merge_classes_multichain <- function(n_groups, chain_list, burnin_list, method = "average", ...) {
     if(typeof(burnin_list) != "list") {
         burnin_list <- map(1:length(chain_list), ~burnin_list)
     }
@@ -28,7 +28,8 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
         }
     }
     rles <- map(z_chain, ~ apply(.x, 1, function(X) rle(sort(X))))
-    z <- map(rles, ~ map_int(.x, ~ .x$values[which.max(.x$lengths)])) %>%
+    
+    z <- map(rles, ~ unlist(map(.x, ~ .x$values[which.max(.x$lengths)]))) %>%
         unlist
 
     nm <- ncol(mu)
@@ -57,7 +58,7 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     }
 
     cluster_dist <- cluster_dist[!rmidx,!rmidx]
-    cl <- hclust(as.dist(cluster_dist), method = "complete")
+    cl <- hclust(as.dist(cluster_dist), method = method, ...)
 
     merge_idx <- cutree(cl, k = n_groups)
     merge_prop <- rep(0, length(unique(merge_idx)))
@@ -91,8 +92,45 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
     merge_prop <- merge_prop / sum(merge_prop)
 
     outz <- z
+    out_rles <- rles
     for (i in sort(unique(merge_idx))) {
-        outz[z %in% as.numeric(names(merge_idx[merge_idx == i]))] <- i
+        grp <- as.numeric(names(merge_idx[merge_idx == i]))
+        outz[z %in% grp] <- i
+        
+        for(g in names(rles)) {
+            for(r in seq_along(rles[[g]])) {
+                out_rles[[g]][[r]]$values[rles[[g]][[r]]$values %in% grp] <- i
+            }
+        }
+    }
+    
+    for (i in sort(unique(merge_idx))) {
+        for(g in names(rles)) {
+            for(r in seq_along(rles[[g]])) {
+                
+                reduce_idx <- out_rles[[g]][[r]]$values == i
+                
+                if(sum(reduce_idx) > 1) {
+                    out_rles[[g]][[r]]$lengths[reduce_idx] <-
+                        sum(out_rles[[g]][[r]]$lengths[reduce_idx])
+                    out_rles[[g]][[r]]$lengths <- out_rles[[g]][[r]]$lengths[-tail(which(reduce_idx), -1)]
+                    out_rles[[g]][[r]]$values <- out_rles[[g]][[r]]$values[-tail(which(reduce_idx), -1)]    
+                }
+                
+            }
+        }
+    }
+    
+    # clean up leftovers that were never MAP
+    for(g in names(rles)) {
+        for(r in seq_along(rles[[g]])) {
+            rmidx <- !(out_rles[[g]][[r]]$values %in% sort(unique(merge_idx)))
+            
+            if(any(rmidx)) {
+                out_rles[[g]][[r]]$lengths <- out_rles[[g]][[r]]$lengths[!rmidx]
+                out_rles[[g]][[r]]$values <- out_rles[[g]][[r]]$values[!rmidx]
+            }
+        }
     }
 
     list(
@@ -100,7 +138,9 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list) {
         "merged_mu" = merge_mu,
         "merged_sigma" = merge_sigma,
         "merged_prop" = merge_prop,
-        "clustering" = cl
+        "clustering" = cl,
+        "distmat" = cluster_dist,
+        "merged_rles" = out_rles
     )
 }
 
@@ -209,7 +249,9 @@ get_row_reordering_multichain <- function(row_clustering, chain_list, burnin_lis
 
   # Get MAP class labels based on posterior samples
   # rename cluster labels after aggregatng
-  z_list <- map2(chain_list, burnin_list, ~ get_MAP_z(.x, .y))
+  z_list <- map2(chain_list, burnin_list, ~ get_MAP_z(.x, .y))    
+
+  
   newclustlabs <- cumsum(map_int(chain_list, ~ ncol(.x$prop_chain)))
   for(i in 2:length(newclustlabs)) {
       # zold_count <- 1
