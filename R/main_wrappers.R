@@ -60,7 +60,6 @@ get_pairwise_fits <-
                     ), error = function(e) NA))    
             } else {
                 fits <- lapply(1:ncol(combos), function(j)
-                    tryCatch(expr =
                     fconstr0_pGMM(
                         x = z[, combos[, j]],
                         lambda = lambda,
@@ -68,7 +67,7 @@ get_pairwise_fits <-
                         itermax = 200,
                         penaltyType = "SCAD",
                         bound = bound
-                    ), error = function(e) NA))    
+                    ))
             }
         }
         names(fits) <-

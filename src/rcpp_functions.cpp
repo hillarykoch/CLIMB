@@ -743,7 +743,6 @@ Rcpp::List cfconstr0_pGMM(arma::mat& x,
                          double tol,
                          unsigned int LASSO,
                          double bound = 0.0) {
-
     const int n = x.n_rows;
     const int d = x.n_cols;
     double delta = 1;
@@ -769,8 +768,10 @@ Rcpp::List cfconstr0_pGMM(arma::mat& x,
 
     for(int step = 0; step < citermax; ++step) {
         // E step
+        
         for(int i = 0; i < k; ++i) {
-            arma::rowvec tmp_mu = mu_old.row(i);
+            
+            tmp_mu = mu_old.row(i);
             tmp_sigma = cget_constr_sigma(sigma_old.row(i), rho_old, combos.row(i), d);
             
             try {
@@ -801,14 +802,15 @@ Rcpp::List cfconstr0_pGMM(arma::mat& x,
 
         init_val.set_size(a + 2);
         init_val.subvec(0,a-1) = log(abs(sgn_mu_in));
-
+        
+        
         init_val(a) = log(sigma_in);
         init_val(a + 1) = rho_old;
 
         // Optimize using optim
         param_new.copy_size(init_val);
         //param_new = optim0_rcpp(init_val, x, h_est, combos, a, negidx);
-
+        
         if(bound == 0.0) {
             param_new = optim0_rcpp(init_val, x, h_est, combos, a, negidx);
         } else {

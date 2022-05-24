@@ -105,7 +105,7 @@ fconstr_pGMM <-
                   init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] < 0) %>% abs) %>%
             mean(na.rm = TRUE) %>%
             max(.1) %>%
-            min(sigma0 / 2) %>%
+            min(sigma0 / 3) %>%
             matrix
 
         if (sum(prop0 == 0) > 0) {
@@ -245,7 +245,7 @@ fconstr0_pGMM <-
                   init$sigma[1, 2, ] %>% `[` (init$sigma[1, 2, ] < 0) %>% abs) %>%
             mean(na.rm = TRUE) %>%
             max(.1) %>%
-            min(sigma0 / 2) %>%
+            min(sigma0 / 3) %>%
             matrix
 
         # Eliminate empty clusters
@@ -268,7 +268,7 @@ fconstr0_pGMM <-
         LASSO <- ifelse(all(penaltyType == "LASSO"), 1, 0)
         for (i in seq_along(lambda)) {
             # estimate penalized GMM for a given lambda
-            curGMM <- cfconstr0_pGMM(
+            curGMM <- tryCatch(expr = cfconstr0_pGMM(
                 x = x,
                 prop = prop0,
                 mu = mu0,
@@ -282,13 +282,17 @@ fconstr0_pGMM <-
                 tol = tol,
                 LASSO = LASSO,
                 bound = bound
-            )
+            ), error = function(e) NA)
+            
+            if(is.na(curGMM[[1]])) {
+                next
+            }
 
             if (!any(names(curGMM) == "optim_err")) {
                 ll_temp <- curGMM$ll
                 df_temp <- curGMM$df
                 BIC  <- sum(ll_temp) - sum(df_temp) * log(n) / 2
-            } else{
+            } else {
                 next
             }
 
