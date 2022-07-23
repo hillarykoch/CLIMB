@@ -20,12 +20,9 @@ Balázs Dezső, Alpár Jüttner, Péter Kovács. LEMON – an Open Source C++ Gr
     *   GCC: [see here, for example](https://www.gnu.org/software/gcc/projects/cxx-status.html#cxx11)
     *   clang: [see here](http://clang.llvm.org/cxx_status.html)
 
-3. You also need a more recent version of the Julia programming language, version >= 1.0 (**CLIMB was developed with Julia version 1.0.2, but has been tested with version 1.5.3**):
+3. You also need a more recent version of the Julia programming language, version >= 1.0 (**CLIMB was developed with Julia version 1.0.2, but has been tested with version 1.5.3, as well as the experimental (as of 07/23/2022) v1.8.0 for macOS ARM for M-series processors**):
     *   Download Julia [here](https://julialang.org/downloads/)
-    *   Or, if you have Homebrew, from the terminal you can type
-    ```console
-    brew install --cask julia
-    ```
+
 4. Julia is used to support a Metropolis-within-Gibbs sampler. You will need to install the companion Julia module to this R package, called cgibbs.jl, to implement this. Please see [my other git repo](https://github.com/hillarykoch/cgibbs.jl) for the brief installation instructions.
 
 ## Getting the package
