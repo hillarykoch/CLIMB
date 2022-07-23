@@ -330,15 +330,16 @@ combine_prunes <- function(prune1, prune2, h, split_layer) {
     join_pair <- h[paste0(split_layer, "_", split_layer + 1)][[1]]
     
     map_dfr(1:nrow(join_pair), ~ {
-        l_candidates <- prune1[prune1[,split_layer] == join_pair[.x,1],]
-        r_candidates <- prune2[prune2[,1] == join_pair[.x,2],]
-        suppressMessages(tidyr::expand_grid(
+        l_candidates <- prune1[prune1[, split_layer] == join_pair[.x,1],,drop = FALSE] %>%
+            magrittr::set_colnames(paste0("V", 1:ncol(.)))
+        r_candidates <- prune2[prune2[, 1] == join_pair[.x, 2], , drop = FALSE] %>%
+            magrittr::set_colnames(paste0("V", (ncol(l_candidates) + 1):(ncol(l_candidates) + ncol(.))))
+        tidyr::expand_grid(
             as_tibble(l_candidates),
             as_tibble(r_candidates),
             .name_repair = "unique"
-        ))
-    }) %>%
-        as.matrix
+        )
+    }) %>% as.matrix 
 } 
 
 # Put everything together in one function here, get_reduced_classes
