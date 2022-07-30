@@ -348,6 +348,10 @@ get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = TR
     filt <- filter_h(h, d)
     write_LGF(h, d, filepath)
     
+    if(d < 5 & split_in_two) {
+        split_in_two <- FALSE
+    }
+    
     if(!split_in_two) {
         paths <- get_paths(filepath)
         assoc <- cassociate(paths, filepath, length(unlist(filt)))
