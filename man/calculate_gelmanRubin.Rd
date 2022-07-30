@@ -23,12 +23,3 @@ calculate_gelmanRubin(chain_list, burnin_list)
 }
 \author{\email{hbk5086@psu.edu}}
 \references{Gelman, A., and D. B. Rubin. 1992. Inference from Iterative Simulation Using Multiple Sequences. Statistical Science 7: 457–511.}
-\examples{
-    data(sim)
-    #------------------------------------------------------------
-    # Not run:
-    #
-    # fits <- get_pairwise_fits(z = sim$data, parallel = FALSE)
-    # plot(sim$data[,1:2], col = fits[[1]]$cluster)
-    #------------------------------------------------------------
-}
