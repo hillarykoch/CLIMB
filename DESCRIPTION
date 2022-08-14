@@ -1,7 +1,7 @@
 Package: CLIMB
 Type: Package
 Title: Composite LIkelihood eMpirical Bayes
-Version: 1.0.0
+Version: 1.1.0
 Author: Hillary Koch
 Maintainer: <hillary.koch01@gmail.com>
 Description: Simulation, class selection, and mixture modeling for models with a combinatorial explosion in the number of latent classes.

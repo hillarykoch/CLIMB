@@ -3,7 +3,13 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list, method =
         burnin_list <- map(1:length(chain_list), ~burnin_list)
     }
     newclustlabs <- cumsum(map_int(chain_list, ~ ncol(.x$prop_chain)))
-
+    
+    # for weighting by sample size
+    n <- map_int(chain_list, ~ nrow(.x$z_chain))
+    n_rep <- map_int(chain_list, ~ ncol(.x$prop_chain)) %>%
+                map2(n, ~ rep(.y, .x)) %>%
+                unlist()
+    
     mu <- map2(chain_list, burnin_list, ~
                    map_dfc(.x$mu_chains, ~ colMeans(.x[-.y, ]), .y = .y) %>%
                    as.matrix %>%
@@ -74,7 +80,8 @@ merge_classes_multichain <- function(n_groups, chain_list, burnin_list, method =
         
         sub_sigma <- sig_ests[,,subidx]
         
-        merge_prop[i] <- sum(sub_prop)
+        # merge_prop[i] <- sum(sub_prop)
+        merge_prop[i] <- (sub_prop %*% n_rep[subidx]) / sum(n_rep[subidx])
 
         if (length(sub_prop) == 1) {
             merge_mu[i, ] <- sub_mu

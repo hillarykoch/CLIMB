@@ -184,8 +184,9 @@ split_LGF <- function(path) {
             label = as.character(min(as.numeric(.$label))-1),
             dim = split_layer,
             assoc = "0")) %>%
+        mutate(label = as.numeric(label)) %>%
         arrange(label) %>%
-        mutate(dim = dim - split_layer)
+        mutate(dim = dim - split_layer, label = as.character(label))
     
     # two arc sets
     lgf_arcs1 <- dplyr::filter(lgf_arcs, end < max(as.numeric(lgf_nodes1$label))) %>%
@@ -323,7 +324,7 @@ prune_paths <- function(h, assoc_mx, split_layer = 0) {
     # If a row is ever not a keeper (contains at least one 0), remove it
     prunes <- apply(keepers, MARGIN = 1, function(X)
         any(X == 0))
-    assoc_mx[!prunes, ]
+    assoc_mx[!prunes, ,drop = FALSE]
 }
 
 combine_prunes <- function(prune1, prune2, h, split_layer) {
@@ -348,7 +349,7 @@ get_reduced_classes <- function(fits, d, filepath = "lgf.txt", split_in_two = TR
     filt <- filter_h(h, d)
     write_LGF(h, d, filepath)
     
-    if(d < 5 & split_in_two) {
+    if(d <= 5 & split_in_two) {
         split_in_two <- FALSE
     }
     
