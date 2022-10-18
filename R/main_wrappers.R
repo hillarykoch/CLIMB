@@ -9,6 +9,7 @@ get_pairwise_fits <-
         combos <- combn(ncol(z), 2)
         n <- nrow(z)
         lambda <- sqrt(log(n)) * 10 ^ seq(-1, 0.5, length.out = nlambda)
+        z <- as.data.frame(z)
 
         if (parallel) {
             if(ncores > ncol(combos)) {
